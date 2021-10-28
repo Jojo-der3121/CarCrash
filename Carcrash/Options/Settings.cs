@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+using Carcrash.Game;
 
 namespace Carcrash.Options
 {
@@ -10,6 +8,6 @@ namespace Carcrash.Options
         public int DifficultyLevel { get; set; }
         public ConsoleColor Color { get; set; }
         public int Sound { get; set; }
-        public int PlayerAmount { get; set; }
+        public PlayMode PlayMode { get; set; }
     }
 }

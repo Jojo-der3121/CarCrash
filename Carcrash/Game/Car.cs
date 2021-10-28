@@ -64,7 +64,7 @@ namespace Carcrash
             return null;
         }
 
-        public void WichPlayerIsPlaying(int index)
+        public void ApplyPlayerInput(int index)
         {
             if (index == 1)
             {

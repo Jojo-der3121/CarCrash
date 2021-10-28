@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Carcrash.Game;
 using Carcrash.Options;
 using Newtonsoft.Json;
 
@@ -118,11 +119,11 @@ namespace Carcrash
         {
             DrawTable( "Player Amount", "   1P   ", "   2p   ", "        ");
             var selection = _menu.SelectionProcess(11, 13, 39, 49);
-            _settings.PlayerAmount = selection switch
+            _settings.PlayMode = selection switch
             {
-                11 => 1,
-                13 => 2,
-                _ => _settings.PlayerAmount
+                11 => PlayMode.SinglePlayer,
+                13 => PlayMode.MultiPlayer,
+                _ => _settings.PlayMode
             };
             Console.Clear();
             Configurate(_settings);

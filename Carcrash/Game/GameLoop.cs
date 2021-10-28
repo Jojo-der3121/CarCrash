@@ -22,14 +22,14 @@ namespace Carcrash
         {
             _settings = settings;
             Console.CursorVisible = false;
-            _groundList = FillGroundList(settings.PlayerAmount);
+            _groundList = FillGroundList(settings.PlayMode);
             GameMode();
         }
 
 
         private void GameMode()
         {
-            if (_settings.PlayerAmount == 1)
+            if (_settings.PlayMode == PlayMode.SinglePlayer)
             {
                 SinglePlayerLoop(_settings);
             }
@@ -63,8 +63,8 @@ namespace Carcrash
                     _enemyCar1.Movement(0);
                     _enemyCar2.Movement(38);
                 }
-                _car1.WichPlayerIsPlaying(1);
-                _car2.WichPlayerIsPlaying(2);
+                _car1.ApplyPlayerInput(1);
+                _car2.ApplyPlayerInput(2);
                 _road.Movement();
                 if (_car1._left < 38 && _car1._left > 27) // fix this 
                 {
@@ -121,7 +121,7 @@ namespace Carcrash
                     Draw(_enemyCar1._left, _enemyCar1._top, _enemyCar1.Design);
                 }
                 Draw(_car1._left, _car1._top, _car1.Design);
-                _car1.WichPlayerIsPlaying(1);
+                _car1.ApplyPlayerInput(1);
                 _car1.Score += 1;
                 if (_car1._left < 38 && _car1._left > 27)
                 {
@@ -152,19 +152,19 @@ namespace Carcrash
             return false;
         }
 
-        private List<string> FillGroundList(int index)
+        private List<string> FillGroundList(PlayMode playMode)
         {
             var groundListModel = new List<string>();
-            switch (index)
+            switch (playMode)
             {
-                case 1:
+                case PlayMode.SinglePlayer:
                     for (var i = 0; i < 31; i++)
                     {
                         groundListModel.Add("                                            ║                 ║║                 ║                                       ");
                     }
                     groundListModel[5] = groundListModel[7].Insert(95, "Score:").Remove(118);
                     return groundListModel;
-                case 2:
+                case PlayMode.MultiPlayer:
                     for (var i = 0; i < 31; i++)
                     {
                         groundListModel.Add(" ║                 ║║                 ║     ║                 ║║                 ║                                       ");
@@ -172,8 +172,9 @@ namespace Carcrash
                     groundListModel[5] = groundListModel[5].Insert(95, "Car2Score:").Remove(118);
                     groundListModel[8] = groundListModel[8].Insert(95, "Car1Score:").Remove(118);
                     return groundListModel;
+                default: throw new ArgumentException(nameof(PlayMode));
             }
-            return null;
+            
         }
 
         private bool CalculateCollision(CollisionBoarder collisionBoarderA, CollisionBoarder collisionBoarderB)
