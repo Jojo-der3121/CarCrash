@@ -110,7 +110,7 @@ namespace Carcrash
             while (true)
             {
                 Draw(0, 31, _groundList);
-                Console.SetCursorPosition(95, 26);
+                Console.SetCursorPosition(95, 27);
                 Console.Write(_car1.Score / 25);
                 Draw(53, _road._top, _road.Design);
                 Draw(72, _road._top, _road.Design);
