@@ -7,25 +7,20 @@ namespace Carcrash
 {
     class Car
     {
-        public int _left;
-        public int _top;
-        public List<int> CollisionDimensions;
-        public CollisionBoarder CollisionBoarder = new CollisionBoarder();
+       
+        public List<int> ObjectDimensions;
+        public ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
         public double Score = 0;
-        public int DesignIndex;
 
         public List<string> Design;
 
         public Car(int left, int designIndex)
         {
-            _top = 26;
-            _left = left;
-            DesignIndex = designIndex;
             Design = AutoModel(designIndex);
-            CollisionDimensions = FillCollisionDimensions();
-            CollisionBoarder.Left = _left;
-            CollisionBoarder.Top = _top;
-            CollisionBoarder.CollisionDimensions= CollisionDimensions;
+            ObjectDimensions = FillCollisionDimensions();
+            ObjectSizeAndLocation.Left = left;
+            ObjectSizeAndLocation.Top = 26;
+            ObjectSizeAndLocation.CollisionDimensions= ObjectDimensions;
         }
 
         private List<int> FillCollisionDimensions()
@@ -90,30 +85,30 @@ namespace Carcrash
                 switch (key.Key)
                 {
                     case ConsoleKey.W:
-                        if (_top > 0)
+                        if (ObjectSizeAndLocation.Top > 0)
                         {
-                            _top--;
+                            ObjectSizeAndLocation.Top--;
                         }
 
                         break;
                     case ConsoleKey.S:
-                        if (_top < 29)
+                        if (ObjectSizeAndLocation.Top < 29)
                         {
-                            _top++;
+                            ObjectSizeAndLocation.Top++;
                         }
 
                         break;
                     case ConsoleKey.A:
-                        if (_left > 3)
+                        if (ObjectSizeAndLocation.Left > 3)
                         {
-                            _left -= 3;
+                            ObjectSizeAndLocation.Left -= 3;
                         }
 
                         break;
                     case ConsoleKey.D:
-                        if (_left < 110)
+                        if (ObjectSizeAndLocation.Left < 110)
                         {
-                            _left += 3;
+                            ObjectSizeAndLocation.Left += 3;
                         }
 
                         break;
@@ -139,30 +134,30 @@ namespace Carcrash
                 switch (key.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        if (_top > 0)
+                        if (ObjectSizeAndLocation.Top > 0)
                         {
-                            _top--;
+                            ObjectSizeAndLocation.Top--;
                         }
 
                         break;
                     case ConsoleKey.DownArrow:
-                        if (_top < 29)
+                        if (ObjectSizeAndLocation.Top < 29)
                         {
-                            _top++;
+                            ObjectSizeAndLocation.Top++;
                         }
 
                         break;
                     case ConsoleKey.LeftArrow:
-                        if (_left > 3)
+                        if (ObjectSizeAndLocation.Left > 3)
                         {
-                            _left -= 3;
+                            ObjectSizeAndLocation.Left -= 3;
                         }
 
                         break;
                     case ConsoleKey.RightArrow:
-                        if (_left < 110)
+                        if (ObjectSizeAndLocation.Left < 110)
                         {
-                            _left += 3;
+                            ObjectSizeAndLocation.Left += 3;
                         }
                         break;
                 }

@@ -7,24 +7,23 @@ namespace Carcrash
     class Cars
     {
 
-        public int _left;
-        public int _top;
+       
         public List<string> Design;
-        public List<int> CollisionDimensions;
-        public CollisionBoarder CollisionBoarder = new CollisionBoarder();
+        public List<int> ObjectDimensions;
+        public ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
         private Random random = new Random();
         private int _movementSpeed = 1;
 
         public Cars( int left)
         {
-            _left = left;
-            _top = 0;
+             
+           
             Design = AutoModel();
-            CollisionDimensions = FillCollisionDimensions();
-            CollisionDimensions = FillCollisionDimensions();
-            CollisionBoarder.Left = _left;
-            CollisionBoarder.Top = _top;
-            CollisionBoarder.CollisionDimensions = CollisionDimensions;
+            ObjectDimensions = FillCollisionDimensions();
+            ObjectDimensions = FillCollisionDimensions();
+            ObjectSizeAndLocation.Left = left;
+            ObjectSizeAndLocation.Top = 0;
+            ObjectSizeAndLocation.CollisionDimensions = ObjectDimensions;
         }
 
         private List<int> FillCollisionDimensions()
@@ -48,37 +47,37 @@ namespace Carcrash
         }
         public void Movement(int deviation)
         {
-            _top += _movementSpeed;
-            if (_top == 34)
+            ObjectSizeAndLocation.Top += _movementSpeed;
+            if (ObjectSizeAndLocation.Top == 34)
             {
                var leftCache = random.Next(1,5);
                switch (leftCache)
                {
                    case 1:
-                       _left = 46-deviation;
+                       ObjectSizeAndLocation.Left = 46-deviation;
                        ChangeDesign();
                        _movementSpeed = 2;
                        break;
                    case 2:
-                       _left = 55-deviation;
+                       ObjectSizeAndLocation.Left = 55-deviation;
                        ChangeDesign();
                        _movementSpeed = 2;
                        break;
                    case 3:
-                       _left = 64-deviation;
+                       ObjectSizeAndLocation.Left = 64-deviation;
                        Design.Clear();
                        Design = AutoModel();
                        _movementSpeed = 1;
                         break;
                    case 4:
-                       _left = 73-deviation;
+                       ObjectSizeAndLocation.Left = 73-deviation;
                        Design.Clear();
                        Design = AutoModel();
                        _movementSpeed = 1;
                         break;
                }
 
-               _top = 0;
+               ObjectSizeAndLocation.Top = 0;
             }
         }
 
