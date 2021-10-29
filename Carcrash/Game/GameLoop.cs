@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Carcrash.Enums;
 using Carcrash.Game;
 using Carcrash.Options;
 
@@ -12,12 +13,25 @@ namespace Carcrash
         private List<string> _groundList = new List<string>();
         private readonly List<string> _bufferList = new List<string>();
         private readonly Road _road = new Road();
-        private readonly Car _car1 = new Car(74, 0);
-        private readonly Car _car2 = new Car(74, 2);
+        private readonly Car _car1 = new Car(74, 0,Controls.WSAD);
+        private readonly Car _car2 = new Car(74, 2,Controls.ArrowKeys);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
         private Settings _settings = new Settings();
+        private const int ScoreDivider = 25;
+        private const int ScoreBoardLeft = 95;
+        private const int RightRoadLeftBoarder = 45;
+        private const int RightRoadRightBoarder = 45 + 19;
+        private const int LeftRoadLeftBoarder = 2;
+        private const int LeftRoadRightBoarder = 2 + 19;
+        private const int ExtraScore = 9;
+        private const int NoDeviation = 0;
+        private const int LeftRoadMiddleOfLeftLane = 10;
+        private const int LeftRoadMiddleOfRightLane = 29;
+        private const int RightRoadMiddleOfLeftLane = 53;
+        private const int RightRoadMiddleOfRightLane = 72;
 
+        
         public void Game(Settings settings)
         {
             _settings = settings;
@@ -31,101 +45,99 @@ namespace Carcrash
         {
             if (_settings.PlayMode == PlayMode.SinglePlayer)
             {
-                SinglePlayerLoop(_settings);
+                SinglePlayerLoop();
             }
-            MultiPlayerLoop(_settings);
+            MultiPlayerLoop();
 
         }
 
-        private void MultiPlayerLoop(Settings settings)
+        private void MultiPlayerLoop()
         {
-            var car1Dead = false;
-            var car2Dead = false;
             _car1.ObjectSizeAndLocation.Left = 31;
             _car1.Design = _car1.AutoModel(1);
             while (true)
             {
-                Draw(0, 30, _groundList);
-                Draw(10, _road._top, _road.Design);
-                Draw(29, _road._top, _road.Design);
-                Draw(53, _road._top, _road.Design);
-                Draw(72, _road._top, _road.Design);
+                Draw(0, _groundList.Count-1, _groundList);
+                Draw(LeftRoadMiddleOfLeftLane, _road._top, _road.Design);
+                Draw(LeftRoadMiddleOfRightLane, _road._top, _road.Design);
+                Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
+                Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
                 Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
                 Draw(_car2.ObjectSizeAndLocation.Left, _car2.ObjectSizeAndLocation.Top, _car2.Design);
-                Console.SetCursorPosition(95, 26);
-                Console.Write(_car2.Score / 25);
-                Console.SetCursorPosition(95, 23);
-                Console.Write(_car1.Score / 25);
-                if (_car1.Score > 300 || _car2.Score > 300)
+                Console.SetCursorPosition(ScoreBoardLeft, 27);
+                Console.Write(_car2.Score / ScoreDivider);
+                Console.SetCursorPosition(ScoreBoardLeft, 24);
+                Console.Write(_car1.Score / ScoreDivider);
+                if (_car1.Score > ScoreDivider || _car2.Score > ScoreDivider)
                 {
                     Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
                     Draw(_enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.Design);
-                    _enemyCar1.Movement(0);
+                    _enemyCar1.Movement(NoDeviation);
                     _enemyCar2.Movement(42);
                 }
-                _car1.ApplyPlayerInput(1);
-                _car2.ApplyPlayerInput(2);
+                _car1.Steer();
+                _car2.Steer();
                 _road.Movement();
-                if (_car1.ObjectSizeAndLocation.Left < 21 && _car1.ObjectSizeAndLocation.Left > 2|| _car1.ObjectSizeAndLocation.Left < 45 + 19 && _car1.ObjectSizeAndLocation.Left > 45) 
+                if (_car1.ObjectSizeAndLocation.Left < LeftRoadRightBoarder && _car1.ObjectSizeAndLocation.Left > LeftRoadLeftBoarder|| _car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder) 
                 {
-                    _car1.Score += 9;
+                    _car1.Score += ExtraScore;
                 }
-                if (_car2.ObjectSizeAndLocation.Left < 45+19 && _car2.ObjectSizeAndLocation.Left > 45|| _car2.ObjectSizeAndLocation.Left < 21 && _car2.ObjectSizeAndLocation.Left > 2)
+                if (_car2.ObjectSizeAndLocation.Left < RightRoadRightBoarder && _car2.ObjectSizeAndLocation.Left > RightRoadLeftBoarder|| _car2.ObjectSizeAndLocation.Left < LeftRoadRightBoarder && _car2.ObjectSizeAndLocation.Left > LeftRoadLeftBoarder)
                 {
-                    _car2.Score += 9;
+                    _car2.Score += ExtraScore;
                 }
                 if (CheckForCollisions(_car1.ObjectSizeAndLocation))
                 {
-                    car1Dead = true;
+                    _car1._dead = true;
                 }
 
                 if (CheckForCollisions(_car2.ObjectSizeAndLocation))
                 {
-                    car2Dead = true;
+                    _car2._dead = true;
                 }
-                if (!car1Dead)
+                if (!_car1._dead)
                 {
-                    _car1.Score += 1;
+                    _car1.Score ++;
                 }
-                if (!car2Dead)
+                if (!_car2._dead)
                 {
-                    _car2.Score += 1;
+                    _car2.Score ++;
                 }
-                if (car1Dead && car2Dead)
+                if (_car1._dead && _car2._dead)
                 {
                     break;
                 }
             }
             var scoreList = new List<double>
             {
-                _car1.Score/25,
-                _car2.Score/25
+                _car1.Score/ScoreDivider,
+                _car2.Score/ScoreDivider
             };
             Die(scoreList);
         }
 
-        private void SinglePlayerLoop(Settings settings)
+        private void SinglePlayerLoop()
         {
             Console.CursorVisible = false;
             while (true)
             {
-                Draw(0, 31, _groundList);
+                Draw(0, _groundList.Count-1, _groundList);
                 Console.SetCursorPosition(95, 27);
-                Console.Write(_car1.Score / 25);
-                Draw(53, _road._top, _road.Design);
-                Draw(72, _road._top, _road.Design);
+                Console.Write(_car1.Score / ScoreDivider);
+                Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
+                Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
                 _road.Movement();
-                if (_car1.Score > 25)
+                if (_car1.Score > ScoreDivider)
                 {
-                    _enemyCar1.Movement(0);
+                    _enemyCar1.Movement(NoDeviation);
                     Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
                 }
                 Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
-                _car1.ApplyPlayerInput(1);
-                _car1.Score += 1;
-                if (_car1.ObjectSizeAndLocation.Left < 45+19 && _car1.ObjectSizeAndLocation.Left > 45)
+                _car1.Steer();
+                _car1.Score ++;
+                if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder)
                 {
-                    _car1.Score += 9;
+                    _car1.Score += ExtraScore;
                 }
                 if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
                 {
@@ -135,16 +147,18 @@ namespace Carcrash
             }
             var scoreList = new List<double>
             {
-                _car1.Score/25
+                _car1.Score/ScoreDivider
             };
             Die(scoreList);
         }
 
         private bool CheckForCollisions(ObjectSizeAndLocation objectSizeAndLocationA  )
         {
-            var allEnemyCollisionBoarders = new List<ObjectSizeAndLocation>();
-            allEnemyCollisionBoarders.Add(_enemyCar1.ObjectSizeAndLocation);
-            allEnemyCollisionBoarders.Add(_enemyCar2.ObjectSizeAndLocation);
+            var allEnemyCollisionBoarders = new List<ObjectSizeAndLocation>
+            {
+                _enemyCar1.ObjectSizeAndLocation,
+                _enemyCar2.ObjectSizeAndLocation
+            };
             foreach (var collisionBoarderB in allEnemyCollisionBoarders)
             {
                 if (CalculateCollision(objectSizeAndLocationA, collisionBoarderB))

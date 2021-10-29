@@ -20,14 +20,14 @@ namespace Carcrash
             _leaderBoardEntries= SortLeaderBoardEntryList(_leaderBoardEntries);
             FillTable(_leaderBoardEntries);
             var leaderBoardEntry = new LeaderBoardEntry();
-            for (int i = 1; i <= scoreList.Count; i++)
+            for (var i = 1; i <= scoreList.Count; i++)
             {
                 var scoreListIndex = i - 1;
-                Console.SetCursorPosition(2, 3+scoreListIndex*3);
+                Console.SetCursorPosition(2, 3+scoreListIndex*4);
             Console.WriteLine("Score of Car"+i+":"+scoreList[scoreListIndex]);
-            Console.SetCursorPosition(2, 4 +scoreListIndex*3);
+            Console.SetCursorPosition(2, 4 +scoreListIndex*4);
             Console.WriteLine("please Enter Your Name! UwU");
-            Console.SetCursorPosition(2, 5);
+            Console.SetCursorPosition(2, 5 +scoreListIndex*4);
             leaderBoardEntry.Name = Console.ReadLine();
             leaderBoardEntry.Score = scoreList[scoreListIndex];
                _leaderBoardEntries.Add(leaderBoardEntry);

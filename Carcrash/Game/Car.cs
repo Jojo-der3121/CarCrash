@@ -1,26 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Carcrash.Enums;
 using Carcrash.Game;
 
 namespace Carcrash
 {
     class Car
     {
-       
+
         public List<int> ObjectDimensions;
         public ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
         public double Score = 0;
+        public bool _dead = false;
+        private ControlKeys controlKeys = new ControlKeys();
 
         public List<string> Design;
 
-        public Car(int left, int designIndex)
+        public Car(int left, int designIndex, Controls controls)
         {
             Design = AutoModel(designIndex);
             ObjectDimensions = FillCollisionDimensions();
             ObjectSizeAndLocation.Left = left;
             ObjectSizeAndLocation.Top = 26;
-            ObjectSizeAndLocation.CollisionDimensions= ObjectDimensions;
+            ObjectSizeAndLocation.CollisionDimensions = ObjectDimensions;
+            GetControlKeys(controls);
+        }
+
+        private void
+
+            GetControlKeys(Controls controls)
+        {
+            if (controls == Controls.WSAD)
+            {
+                controlKeys.Up = ConsoleKey.W;
+                controlKeys.Down = ConsoleKey.S;
+                controlKeys.Left = ConsoleKey.A;
+                controlKeys.Right = ConsoleKey.D;
+            }
+            else
+            {
+                controlKeys.Up = ConsoleKey.UpArrow;
+                controlKeys.Down = ConsoleKey.DownArrow;
+                controlKeys.Left = ConsoleKey.LeftArrow;
+                controlKeys.Right = ConsoleKey.RightArrow;
+            }
         }
 
         private List<int> FillCollisionDimensions()
@@ -59,115 +83,116 @@ namespace Carcrash
             return null;
         }
 
-        public void ApplyPlayerInput(int index)
+
+        public void Steer()
         {
-            if (index == 1)
+            if (!_dead)
             {
-                PlayerOneSteer();
-            }
-            else
-            {
-                PlayerTwoSteer();
-            }
-
-        }
-
-        private void PlayerOneSteer()
-        {
-            if (Console.KeyAvailable)
-            {
-                var key = new ConsoleKeyInfo();
-                while (Console.KeyAvailable)
-                    key = Console.ReadKey(true); // skips previous input chars
-
-                Thread.Sleep(10);
-
-                switch (key.Key)
+                if (Console.KeyAvailable)
                 {
-                    case ConsoleKey.W:
+                    var key = new ConsoleKeyInfo();
+                    while (Console.KeyAvailable)
+                        key = Console.ReadKey(true); 
+
+                    Thread.Sleep(10);
+
+                    if (key.Key == controlKeys.Up)
+                    {
                         if (ObjectSizeAndLocation.Top > 0)
                         {
                             ObjectSizeAndLocation.Top--;
                         }
-
-                        break;
-                    case ConsoleKey.S:
+                    }
+                    else if (key.Key == controlKeys.Down)
+                    {
                         if (ObjectSizeAndLocation.Top < 29)
                         {
                             ObjectSizeAndLocation.Top++;
                         }
-
-                        break;
-                    case ConsoleKey.A:
+                    }
+                    else if (key.Key == controlKeys.Left)
+                    {
                         if (ObjectSizeAndLocation.Left > 3)
                         {
                             ObjectSizeAndLocation.Left -= 3;
                         }
-
-                        break;
-                    case ConsoleKey.D:
+                    }
+                    else if (key.Key == controlKeys.Right)
+                    {
                         if (ObjectSizeAndLocation.Left < 110)
                         {
                             ObjectSizeAndLocation.Left += 3;
                         }
-
-                        break;
+                    }
                 }
-
-            }
-            else
-            {
-                Thread.Sleep(10);
-            }
-        }
-
-        private void PlayerTwoSteer()
-        {
-            if (Console.KeyAvailable)
-            {
-                var key = new ConsoleKeyInfo();
-                while (Console.KeyAvailable)
-                    key = Console.ReadKey(true);
-
-                Thread.Sleep(10);
-
-                switch (key.Key)
+                else
                 {
-                    case ConsoleKey.UpArrow:
-                        if (ObjectSizeAndLocation.Top > 0)
-                        {
-                            ObjectSizeAndLocation.Top--;
-                        }
-
-                        break;
-                    case ConsoleKey.DownArrow:
-                        if (ObjectSizeAndLocation.Top < 29)
-                        {
-                            ObjectSizeAndLocation.Top++;
-                        }
-
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        if (ObjectSizeAndLocation.Left > 3)
-                        {
-                            ObjectSizeAndLocation.Left -= 3;
-                        }
-
-                        break;
-                    case ConsoleKey.RightArrow:
-                        if (ObjectSizeAndLocation.Left < 110)
-                        {
-                            ObjectSizeAndLocation.Left += 3;
-                        }
-                        break;
+                    Thread.Sleep(10);
                 }
-
             }
-            else
+            else if (ObjectSizeAndLocation.Top < 37)
             {
-                Thread.Sleep(10);
+
+                ObjectSizeAndLocation.Top++;
             }
 
         }
+
+        //public void PlayerTwoSteer()
+        //{
+        //    if (!_dead)
+        //    {
+        //        if (Console.KeyAvailable)
+        //        {
+        //            var key = new ConsoleKeyInfo();
+        //            while (Console.KeyAvailable)
+        //                key = Console.ReadKey(true);
+
+        //            Thread.Sleep(10);
+
+        //            switch (key.Key)
+        //            {
+        //                case ConsoleKey.UpArrow:
+        //                    if (ObjectSizeAndLocation.Top > 0)
+        //                    {
+        //                        ObjectSizeAndLocation.Top--;
+        //                    }
+
+        //                    break;
+        //                case ConsoleKey.DownArrow:
+        //                    if (ObjectSizeAndLocation.Top < 29)
+        //                    {
+        //                        ObjectSizeAndLocation.Top++;
+        //                    }
+
+        //                    break;
+        //                case ConsoleKey.LeftArrow:
+        //                    if (ObjectSizeAndLocation.Left > 3)
+        //                    {
+        //                        ObjectSizeAndLocation.Left -= 3;
+        //                    }
+
+        //                    break;
+        //                case ConsoleKey.RightArrow:
+        //                    if (ObjectSizeAndLocation.Left < 110)
+        //                    {
+        //                        ObjectSizeAndLocation.Left += 3;
+        //                    }
+        //                    break;
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            Thread.Sleep(10);
+        //        }
+        //    }
+        //    else if (ObjectSizeAndLocation.Top < 37)
+        //    {
+
+        //        ObjectSizeAndLocation.Top++;
+        //    }
+
+        //}
     }
 }
