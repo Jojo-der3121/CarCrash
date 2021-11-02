@@ -1,4 +1,5 @@
 ﻿using System;
+using Carcrash.Game;
 using Carcrash.Options;
 
 namespace Carcrash
@@ -19,8 +20,7 @@ namespace Carcrash
         {
             Console.CursorVisible = false;
             DrawMenuScreen();
-            var selection = SelectionProcess(15,19, 4,17);
-            ExecuteSelection(selection,settings);
+            ExecuteSelection(SelectionProcess(15, 19, 4, 17), settings);
         }
 
 
@@ -46,9 +46,10 @@ namespace Carcrash
             Console.WriteLine("        Options");
             Console.WriteLine("");
             Console.WriteLine("         Exit");
+
         }
 
-        public int SelectionProcess(int lowerBound, int upperBound, int leftBound, int rightBound )
+        public int SelectionProcess(int lowerBound, int upperBound, int leftBound, int rightBound)
         {
             var top = lowerBound;
             while (true)
@@ -69,7 +70,7 @@ namespace Carcrash
                         {
                             top -= 2;
                         }
-                        DrawSelection(top, formerTop,leftBound,rightBound);
+                        DrawSelection(top, formerTop, leftBound, rightBound);
                         break;
                     case ConsoleKey.S:
                     case ConsoleKey.DownArrow:
@@ -82,12 +83,12 @@ namespace Carcrash
                         {
                             top += 2;
                         }
-                        DrawSelection(top, formerTop, leftBound,rightBound);
+                        DrawSelection(top, formerTop, leftBound, rightBound);
                         break;
                     case ConsoleKey.Enter:
                     case ConsoleKey.Spacebar:
                         return top;
-                    
+
                 }
             }
         }
@@ -106,23 +107,23 @@ namespace Carcrash
 
         }
 
-        private void ExecuteSelection(int selection,Settings settings)
+        private void ExecuteSelection(int selection, Settings settings)
         {
-            var loop = new GameLoop();
             var options = new OptionsMenu();
             Console.Clear();
             switch (selection)
             {
                 case 15:
-                    loop.Game(settings);
+                    OnlineOrLocal(settings);
                     break;
                 case 17:
                     options.Configurate(settings);
                     break;
                 case 19:
-                    LeaderBoard.Serialize(settings,options.FilePath);
+                    LeaderBoard.Serialize(settings, options.FilePath);
                     Environment.Exit(0);
                     break;
+
             }
         }
 
@@ -140,5 +141,18 @@ namespace Carcrash
             Console.Clear();
         }
 
+        private void OnlineOrLocal(Settings settings)
+        {
+            var networkMenu = new NetworkMenu(settings);
+            var loop = new GameLoop(settings);
+            if (settings.PlayMode == PlayMode.SinglePlayer)
+            {
+                loop.SinglePlayerLoop();
+            }
+            else
+            {
+                networkMenu.NetworkSelectionMenu();
+            }
+        }
     }
 }

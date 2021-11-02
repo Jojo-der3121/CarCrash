@@ -9,36 +9,45 @@ namespace Carcrash
 {
     class LeaderBoard
     {
-        private const string FilePath = @"C:\Users\jbb\source\repos\Carcrash\Carcrash\LeaderBoard\CarCrashLeaderBoard.json";
+        private string FilePath;
         private List<LeaderBoardEntry> _leaderBoardEntries = new List<LeaderBoardEntry>();
         private readonly List<string> _tableDesign = new List<string>();
+        private Settings _settings;
 
-        public void CreateLeaderBoard(List<double> scoreList,Settings settings)
+        public LeaderBoard()
         {
+            FilePath = GetFilePath();
+        }
+
+        private string GetFilePath()
+        {
+            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
+            return directory[0] += "Carcrash\\Carcrash\\LeaderBoard\\CarCrashLeaderBoard.json";
+        }
+
+        public void CreateLeaderBoard(double score,Settings settings)
+        {
+            _settings = settings;
             CreateTable();
             _leaderBoardEntries.AddRange(Deserialize(FilePath));
             _leaderBoardEntries= SortLeaderBoardEntryList(_leaderBoardEntries);
             FillTable(_leaderBoardEntries);
             var leaderBoardEntry = new LeaderBoardEntry();
-            for (var i = 1; i <= scoreList.Count; i++)
-            {
-                var scoreListIndex = i - 1;
-                Console.SetCursorPosition(2, 3+scoreListIndex*4);
-            Console.WriteLine("Score of Car"+i+":"+scoreList[scoreListIndex]);
-            Console.SetCursorPosition(2, 4 +scoreListIndex*4);
+            Console.SetCursorPosition(2, 3);
+            Console.WriteLine("Your Score:"+score);
+            Console.SetCursorPosition(2, 4 );
             Console.WriteLine("please Enter Your Name! UwU");
-            Console.SetCursorPosition(2, 5 +scoreListIndex*4);
+            Console.SetCursorPosition(2, 5 );
             leaderBoardEntry.Name = Console.ReadLine();
-            leaderBoardEntry.Score = scoreList[scoreListIndex];
-               _leaderBoardEntries.Add(leaderBoardEntry);
-            }
+            leaderBoardEntry.Score = score;
+            _leaderBoardEntries.Add(leaderBoardEntry);
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             CreateTable();
             FillTable(_leaderBoardEntries);
             Serialize(_leaderBoardEntries,FilePath);
             var menu = new Menu();
             menu.PressEnterToContinue("main menu");
-            menu.Start(settings);
+            menu.Start(_settings);
         }
 
         private void CreateTable()
@@ -65,7 +74,7 @@ namespace Carcrash
             _tableDesign.Add("║ Name:                               ║ Score:                           ║");
             _tableDesign.Add("╔═════════════════════════════════════╦══════════════════════════════════╗");
 
-            var gameLoop = new GameLoop();
+            var gameLoop = new GameLoop(_settings);
             gameLoop.Draw(35, 20, _tableDesign);
         }
 

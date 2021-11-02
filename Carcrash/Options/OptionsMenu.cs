@@ -9,17 +9,27 @@ namespace Carcrash
 {
     class OptionsMenu
     {
-        public Settings _settings = new Settings();
-        public readonly string FilePath = @"C:\Users\jbb\source\repos\Carcrash\Carcrash\Options\CarCrashSettings.json";
+        private Settings _settings = new Settings();
+        public readonly string FilePath;
         private readonly Menu _menu = new Menu();
-        private readonly GameLoop _gameLoop = new GameLoop();
+        private GameLoop _gameLoop;
 
+        public OptionsMenu()
+        {
+            FilePath = GetFilePath();
+        }
 
+        private string GetFilePath()
+        {
+            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
+            return directory[0] += "Carcrash\\Carcrash\\Options\\CarCrashSettings.json";
+        }
 
 
         public void Configurate(Settings settings)
         {
             _settings = settings;
+            _gameLoop = new GameLoop(_settings);
             DrawOptionMenu();
             SelectWhatToConfigurate();
 
@@ -38,7 +48,7 @@ namespace Carcrash
             Console.WriteLine("");
             Console.WriteLine("   >>   Difficulty  <<");
             Console.WriteLine("");
-            Console.WriteLine("      Player Amount");
+            Console.WriteLine("        GameMode");
             Console.WriteLine("");
             Console.WriteLine("         Sound");
             Console.WriteLine("");
@@ -77,23 +87,27 @@ namespace Carcrash
         private void DrawTable( string WhatIsEdited, string option1, string option2, string option3)
         {
             var frame = "";
+            var whiteSpace = "";
             for (var i = 0; i < option3.Length; i++)
             {
                 frame = String.Concat(frame, "─");
+                whiteSpace = String.Concat(whiteSpace," ");
             }
+
+            var titleWhiteSpace = whiteSpace.Remove(whiteSpace.Length - WhatIsEdited.Length+5);
             var tableList = new List<string>
             {
                 "╚═────"+frame+"────═╝",
-                "│                  │",
-                "│                  │",
-                "│                  │",
+                "│     "+whiteSpace+"     │",
+                "│     "+whiteSpace+"     │",
+                "│     "+whiteSpace+"     │",
                 "│     "+option3+"     │",
-                "│                  │",
+                "│     "+whiteSpace+"     │",
                 "│     "+option2+"     │",
-                "│                  │",
+                "│     "+whiteSpace+"     │",
                 "│   >>"+option1+"<<   │",
-                "│                  │",
-                "│Edit "+WhatIsEdited+"│",
+                "│     "+whiteSpace+"     │",
+                "│Edit "+WhatIsEdited+titleWhiteSpace+"│",
                 "╔═────"+frame+"────═╗"
             };
             _gameLoop.Draw(35, 19, tableList);
@@ -117,8 +131,8 @@ namespace Carcrash
 
         private void EditPlayerAmount()
         {
-            DrawTable( "Player Amount", "   1P   ", "   2p   ", "        ");
-            var selection = _menu.SelectionProcess(11, 13, 39, 49);
+            DrawTable( "Player Amount", "1P(local) ", "2P(online)", "          ");
+            var selection = _menu.SelectionProcess(11, 13, 39, 51);
             _settings.PlayMode = selection switch
             {
                 11 => PlayMode.SinglePlayer,
@@ -130,6 +144,7 @@ namespace Carcrash
 
 
         }
+
         private void EditSound()
         {
             DrawTable( "Sound:       ", "  Loud  ", "  Soft  ", "  Mute  ");

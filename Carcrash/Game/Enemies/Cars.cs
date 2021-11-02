@@ -16,8 +16,6 @@ namespace Carcrash
 
         public Cars( int left)
         {
-             
-           
             Design = AutoModel();
             ObjectDimensions = FillCollisionDimensions();
             ObjectDimensions = FillCollisionDimensions();
