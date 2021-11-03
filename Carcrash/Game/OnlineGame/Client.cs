@@ -12,8 +12,8 @@ namespace Carcrash.Game.OnlineGame
     {
         private readonly List<string> _groundList;
         private readonly Road _road = new Road();
-        private readonly Car _car1 = new Car(74, 2);
-        private readonly Car _hostCar = new Car(31, 1);
+        private readonly Car _car1 = new Car(74, 2, 1);
+        private readonly Car _hostCar = new Car(31, 1, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
         private const int ScoreDivider = 25;
@@ -62,16 +62,18 @@ namespace Carcrash.Game.OnlineGame
                 {
                     DrawGroundAndRoad();
                     _loop.Draw(_hostCar.ObjectSizeAndLocation.Left, _hostCar.ObjectSizeAndLocation.Top, _hostCar.Design);
+                    _car1.Steer();
+                    streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
+                    streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
                     _loop.Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
                     DrawScores();
-                    if (_car1.Score > ScoreDivider +250|| _hostCar.Score > ScoreDivider+250)
+                    Thread.Sleep(10);
+                    if (_car1.Score > ScoreDivider + 250 || _hostCar.Score > ScoreDivider + 250)
                     {
                         _loop.Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
                         _loop.Draw(_enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.Design);
                     }
-                    _car1.Steer();
-                    streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
-                    streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
+
                     _road.Movement();
                     if (!_car1._dead)
                     {
@@ -168,7 +170,7 @@ namespace Carcrash.Game.OnlineGame
             }
             return false;
         }
-
+        // die drei
         private List<string> CreateLocationList(List<int> dimensionList, int y, int x)
         {
             var locationList = new List<string>();

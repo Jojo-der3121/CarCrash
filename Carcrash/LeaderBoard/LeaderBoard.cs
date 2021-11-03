@@ -12,39 +12,48 @@ namespace Carcrash
         private string FilePath;
         private List<LeaderBoardEntry> _leaderBoardEntries = new List<LeaderBoardEntry>();
         private readonly List<string> _tableDesign = new List<string>();
-        private Settings _settings;
-
-        public LeaderBoard()
-        {
-            FilePath = GetFilePath();
-        }
+        private Settings _settings = new Settings();
 
         private string GetFilePath()
         {
+            var whichDifficulty = "";
+            switch (_settings.DifficultyLevel)
+            {
+                case 0:
+                    whichDifficulty = "Hard";
+                    break;
+                case 1:
+                    whichDifficulty = "Medium";
+                    break;
+                case 5:
+                    whichDifficulty = "Easy";
+                    break;
+            }
             var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            return directory[0] += "Carcrash\\Carcrash\\LeaderBoard\\CarCrashLeaderBoard.json";
+            return directory[0] += "Carcrash\\Carcrash\\LeaderBoard\\CarCrashLeaderBoard" + whichDifficulty + ".json";
         }
 
-        public void CreateLeaderBoard(double score,Settings settings)
+        public void CreateLeaderBoard(double score, Settings settings)
         {
             _settings = settings;
+            FilePath = GetFilePath();
             CreateTable();
             _leaderBoardEntries.AddRange(Deserialize(FilePath));
-            _leaderBoardEntries= SortLeaderBoardEntryList(_leaderBoardEntries);
+            _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             FillTable(_leaderBoardEntries);
             var leaderBoardEntry = new LeaderBoardEntry();
             Console.SetCursorPosition(2, 3);
-            Console.WriteLine("Your Score:"+score);
-            Console.SetCursorPosition(2, 4 );
+            Console.WriteLine("Your Score:" + score);
+            Console.SetCursorPosition(2, 4);
             Console.WriteLine("please Enter Your Name! UwU");
-            Console.SetCursorPosition(2, 5 );
+            Console.SetCursorPosition(2, 5);
             leaderBoardEntry.Name = Console.ReadLine();
             leaderBoardEntry.Score = score;
             _leaderBoardEntries.Add(leaderBoardEntry);
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             CreateTable();
             FillTable(_leaderBoardEntries);
-            Serialize(_leaderBoardEntries,FilePath);
+            Serialize(_leaderBoardEntries, FilePath);
             var menu = new Menu();
             menu.PressEnterToContinue("main menu");
             menu.Start(_settings);
@@ -86,7 +95,7 @@ namespace Carcrash
             {
                 howManyEntriesWillBeDrawn = leaderBoardEntryList.Count;
             }
-            for (var i= 0 ; i< howManyEntriesWillBeDrawn ;i++)
+            for (var i = 0; i < howManyEntriesWillBeDrawn; i++)
             {
                 var leaderBoardEntry = leaderBoardEntryList[i];
                 Console.SetCursorPosition(36, y);
@@ -109,7 +118,7 @@ namespace Carcrash
             return sortedList;
         }
 
-        public static void Serialize(object obj,string filePath)
+        public static void Serialize(object obj, string filePath)
         {
             var jsonString = JsonConvert.SerializeObject(obj);
             File.WriteAllText(filePath, jsonString);

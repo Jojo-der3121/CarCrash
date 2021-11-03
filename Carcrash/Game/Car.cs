@@ -12,11 +12,12 @@ namespace Carcrash
         public ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
         public double Score = 0;
         public bool _dead = false;
-
+        private int _difficulty;
         public List<string> Design;
 
-        public Car(int left, int designIndex)
+        public Car(int left, int designIndex, int difficulty)
         {
+            _difficulty = difficulty;
             Design = AutoModel(designIndex);
             ObjectDimensions = FillCollisionDimensions();
             ObjectSizeAndLocation.Left = left;
@@ -67,8 +68,6 @@ namespace Carcrash
                     while (Console.KeyAvailable)
                         key = Console.ReadKey(true);
 
-                    Thread.Sleep(10);
-
                     if (key.Key == ConsoleKey.W && ObjectSizeAndLocation.Top > 0)
                     {
                         ObjectSizeAndLocation.Top--;
@@ -79,17 +78,14 @@ namespace Carcrash
                     }
                     else if (key.Key == ConsoleKey.A && ObjectSizeAndLocation.Left > 3)
                     {
-                        ObjectSizeAndLocation.Left -= 3;
+                        ObjectSizeAndLocation.Left -= 4 + _difficulty;
                     }
                     else if (key.Key == ConsoleKey.D && ObjectSizeAndLocation.Left < 110)
                     {
-                        ObjectSizeAndLocation.Left += 3;
+                        ObjectSizeAndLocation.Left += 4 + _difficulty;
                     }
                 }
-                else
-                {
-                    Thread.Sleep(10);
-                }
+               
             }
             else if (ObjectSizeAndLocation.Top < 37)
             {

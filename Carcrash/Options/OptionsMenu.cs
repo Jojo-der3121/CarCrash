@@ -119,9 +119,9 @@ namespace Carcrash
             var selection = _menu.SelectionProcess(11, 15, 39, 49);
             _settings.DifficultyLevel = selection switch
             {
-                11 => 3,
-                13 => 2,
-                15 => 1,
+                11 => 0,
+                13 => 1,
+                15 => 5,
                 _ => _settings.DifficultyLevel
             };
             Console.Clear();

@@ -11,7 +11,7 @@ namespace Carcrash
 
         private readonly List<string> _groundList;
         private readonly Road _road = new Road();
-        private readonly Car _car1 = new Car(74, 0);
+        private readonly Car _car1;
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Settings _settings;
         private const int ScoreDivider = 25;
@@ -27,6 +27,7 @@ namespace Carcrash
         {
             _settings = settings;
             Console.CursorVisible = false;
+            _car1 = new Car(74, 0, _settings.DifficultyLevel);
             _groundList = FillGroundList();
         }
 
@@ -41,14 +42,15 @@ namespace Carcrash
                 Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
                 Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
                 _road.Movement();
-                if (_car1.Score > ScoreDivider)
+                if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
                 {
                     _enemyCar1.Movement(NoDeviation);
                     Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
                 }
-                Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
                 _car1.Steer();
                 _car1.Score++;
+                Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
+                Thread.Sleep(10);
                 if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder)
                 {
                     _car1.Score += ExtraScore;
@@ -58,7 +60,7 @@ namespace Carcrash
                     break;
                 }
             }
-            Die( _car1.Score/ScoreDivider);
+            Die(_car1.Score / ScoreDivider);
         }
 
         private List<string> FillGroundList()
