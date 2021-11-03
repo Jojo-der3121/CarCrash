@@ -63,43 +63,37 @@ namespace Carcrash.Game.OnlineGame
                     DrawGroundAndRoad();
                     _loop.Draw(_hostCar.ObjectSizeAndLocation.Left, _hostCar.ObjectSizeAndLocation.Top, _hostCar.Design);
                     _loop.Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
-
-                    _hostCar.Score = DrawScoresAndGetClientScore();
-                    if (_car1.Score > ScoreDivider|| _hostCar.Score > ScoreDivider)
+                    DrawScores();
+                    if (_car1.Score > ScoreDivider +250|| _hostCar.Score > ScoreDivider+250)
                     {
-                        streamW.WriteLine("give enemyCar1Left");
-                        _enemyCar1.ObjectSizeAndLocation.Left = Convert.ToInt32(streamR.ReadLine());
-                        streamW.WriteLine("give enemyCar1Top");
-                        _enemyCar1.ObjectSizeAndLocation.Top = Convert.ToInt32(streamR.ReadLine());
-                        streamW.WriteLine("give enemyCar2Left");
-                        _enemyCar2.ObjectSizeAndLocation.Left = Convert.ToInt32(streamR.ReadLine());
-                        streamW.WriteLine("give enemyCar2Top");
-                        _enemyCar2.ObjectSizeAndLocation.Top = Convert.ToInt32(streamR.ReadLine());
                         _loop.Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
                         _loop.Draw(_enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.Design);
                     }
                     _car1.Steer();
-                    // host steer
-                    streamW.WriteLine("give Left");
-                    _hostCar.ObjectSizeAndLocation.Left = Convert.ToInt32(streamR.ReadLine());
-                    streamW.WriteLine("give Top");
-                    _hostCar.ObjectSizeAndLocation.Top = Convert.ToInt32(streamR.ReadLine());
+                    streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
+                    streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
                     _road.Movement();
                     if (!_car1._dead)
                     {
                         CheckIfDeadAndGiveScore();
                     }
-                    streamW.WriteLine("check if dead");
-                    _hostCar._dead = Convert.ToBoolean(streamR.ReadLine());// check if host is dead
+                    else
+                    {
+                        Thread.Sleep(10);
+                    }
+                    streamW.WriteLine("clientCar deadStatus:" + _car1._dead);
+                    streamW.WriteLine("clientCar Score:" + _car1.Score);
                     if (_car1._dead && _hostCar._dead)
                     {
                         break;
                     }
                 }
-                Die(_car1.Score/ScoreDivider);
+                Die(_car1.Score / ScoreDivider);
             }
             catch (Exception)
             {
+                Console.Clear();
+                Console.SetCursorPosition(45, 15);
                 Console.WriteLine("The Connection has been Lost...=/");
                 Thread.Sleep(1500);
                 Console.Clear();
@@ -115,19 +109,33 @@ namespace Carcrash.Game.OnlineGame
             {
                 while (true)
                 {
-                    switch (streamR.ReadLine())
+                    var serverInformation = streamR.ReadLine();
+                    var whichServerInformation = GetInformationValue(serverInformation);
+                    switch (whichServerInformation[0])
                     {
-                        case "give Left":
-                            streamW.WriteLine(_car1.ObjectSizeAndLocation.Left);
+                        case "hostCar Left":
+                            _hostCar.ObjectSizeAndLocation.Left = Convert.ToInt32(whichServerInformation[1]);
                             break;
-                        case "give Top":
-                            streamW.WriteLine(_car1.ObjectSizeAndLocation.Top);
+                        case "hostCar Top":
+                            _hostCar.ObjectSizeAndLocation.Top = Convert.ToInt32(whichServerInformation[1]);
                             break;
-                        case "check if dead":
-                            streamW.WriteLine(_car1._dead);
+                        case "hostCar deadStatus":
+                            _hostCar._dead = Convert.ToBoolean(whichServerInformation[1]);
                             break;
-                        case "give Score":
-                            streamW.WriteLine(_car1.Score);
+                        case "hostCar Score":
+                            _hostCar.Score = Convert.ToDouble(whichServerInformation[1]);
+                            break;
+                        case "enemyCar1Left":
+                            _enemyCar1.ObjectSizeAndLocation.Left = Convert.ToInt32(whichServerInformation[1]);
+                            break;
+                        case "enemyCar1Top":
+                            _enemyCar1.ObjectSizeAndLocation.Top = Convert.ToInt32(whichServerInformation[1]);
+                            break;
+                        case "enemyCar2Left":
+                            _enemyCar2.ObjectSizeAndLocation.Left = Convert.ToInt32(whichServerInformation[1]);
+                            break;
+                        case "enemyCar2Top":
+                            _enemyCar2.ObjectSizeAndLocation.Top = Convert.ToInt32(whichServerInformation[1]);
                             break;
                     }
                 }
@@ -136,6 +144,12 @@ namespace Carcrash.Game.OnlineGame
             {
 
             }
+        }
+
+        private string[] GetInformationValue(string serverInformation)
+        {
+            var informationArray = serverInformation.Split(":");
+            return informationArray;
         }
 
         private bool CheckForCollisions(ObjectSizeAndLocation objectSizeAndLocationA)
@@ -154,6 +168,7 @@ namespace Carcrash.Game.OnlineGame
             }
             return false;
         }
+
         private List<string> CreateLocationList(List<int> dimensionList, int y, int x)
         {
             var locationList = new List<string>();
@@ -240,17 +255,13 @@ namespace Carcrash.Game.OnlineGame
 
         }
 
-        private double DrawScoresAndGetClientScore()
+        private void DrawScores()
         {
             Console.SetCursorPosition(ScoreBoardLeft, 27);
-            //client get score
-            streamW.WriteLine("give Score");
-            var clientScore = Convert.ToDouble(streamR.ReadLine());
-            Console.Write(clientScore / ScoreDivider);
+            Console.Write(_hostCar.Score / ScoreDivider);
             Console.SetCursorPosition(ScoreBoardLeft, 24);
             Console.Write(_car1.Score / ScoreDivider);
 
-            return clientScore;
         }
 
         private void CheckIfDeadAndGiveScore()

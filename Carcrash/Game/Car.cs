@@ -27,12 +27,12 @@ namespace Carcrash
         private List<int> FillCollisionDimensions()
         {
             var cacheList = new List<int>();
-            cacheList.Add(6);
-            cacheList.Add(5);
+            cacheList.Add(Design[0].Length);
+            cacheList.Add(Design.Count);
             return cacheList;
         }
 
-        public List<string> AutoModel(int designIndex)
+        private List<string> AutoModel(int designIndex)
         {
             var autoModel = new List<string>
             {
