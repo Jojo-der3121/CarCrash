@@ -64,13 +64,13 @@ namespace Carcrash
                         _movementSpeed = 2;
                         break;
                     case 3:
-                        ObjectSizeAndLocation.Left = 64 - deviation;
+                        ObjectSizeAndLocation.Left = 65 - deviation;
                         Design.Clear();
                         Design = AutoModel();
                         _movementSpeed = 1;
                         break;
                     case 4:
-                        ObjectSizeAndLocation.Left = 73 - deviation;
+                        ObjectSizeAndLocation.Left = 74 - deviation;
                         Design.Clear();
                         Design = AutoModel();
                         _movementSpeed = 1;

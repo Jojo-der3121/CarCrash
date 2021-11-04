@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Carcrash.Options;
@@ -13,7 +11,7 @@ namespace Carcrash.Game.OnlineGame
     {
         private readonly List<string> _groundList;
         private readonly Road _road = new Road();
-        private readonly Car _car1 = new Car(31, 1, 1);
+        private readonly Car _car1;
         private readonly Car _clientCar = new Car(74, 2, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
@@ -43,6 +41,7 @@ namespace Carcrash.Game.OnlineGame
             _settings = settings;
             _groundList = FillGroundList();
             _loop = new GameLoop(_settings);
+            _car1 = new Car(31, 1, _settings.DifficultyLevel);
         }
 
         public void BootServer()
@@ -78,7 +77,17 @@ namespace Carcrash.Game.OnlineGame
                 }
                 Console.SetCursorPosition(101, 24);
                 Console.WriteLine("        ");
-
+                if (Console.KeyAvailable)
+                {
+                   var Input = Console.ReadKey();
+                   if (Input.Key == ConsoleKey.Backspace)
+                   {
+                        Listener.Stop();
+                        Console.Clear();
+                        var menu = new Menu();
+                        menu.Start(_settings);
+                   }
+                }
             }
         }
 
@@ -135,6 +144,10 @@ namespace Carcrash.Game.OnlineGame
                         break;
                     }
                 }
+                if (_settings.Sound != 0)
+                {
+                    Console.Beep(_settings.Sound, 1350);
+                }
                 Die(_car1.Score / ScoreDivider);
             }
             catch (Exception)
@@ -168,6 +181,10 @@ namespace Carcrash.Game.OnlineGame
                             break;
                         case "clientCar deadStatus":
                             _clientCar._dead = Convert.ToBoolean(whichClientInformation[1]);
+                            if (_clientCar._dead && _settings.Sound != 0)
+                            {
+                                Console.Beep(_settings.Sound,1350);
+                            }
                             break;
                         case "clientCar Score":
                             _clientCar.Score = Convert.ToDouble(whichClientInformation[1]);
@@ -261,7 +278,7 @@ namespace Carcrash.Game.OnlineGame
             _loop.Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
-            menu.PressEnterToContinue("leader boards");
+            menu.PressEnterToContinue("leader boards",23,40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);

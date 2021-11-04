@@ -12,7 +12,7 @@ namespace Carcrash.Game.OnlineGame
     {
         private readonly List<string> _groundList;
         private readonly Road _road = new Road();
-        private readonly Car _car1 = new Car(74, 2, 1);
+        private readonly Car _car1; 
         private readonly Car _hostCar = new Car(31, 1, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
@@ -40,6 +40,7 @@ namespace Carcrash.Game.OnlineGame
             _settings = settings;
             _groundList = FillGroundList();
             _loop = new GameLoop(_settings);
+            _car1 = new Car(74, 2, _settings.DifficultyLevel);
         }
 
         public void ConnectToServer()
@@ -90,6 +91,10 @@ namespace Carcrash.Game.OnlineGame
                         break;
                     }
                 }
+                if (_settings.Sound != 0)
+                {
+                    Console.Beep(_settings.Sound, 1350);
+                }
                 Die(_car1.Score / ScoreDivider);
             }
             catch (Exception)
@@ -123,6 +128,10 @@ namespace Carcrash.Game.OnlineGame
                             break;
                         case "hostCar deadStatus":
                             _hostCar._dead = Convert.ToBoolean(whichServerInformation[1]);
+                            if (_hostCar._dead && _settings.Sound != 0)
+                            {
+                                Console.Beep(_settings.Sound, 1350);
+                            }
                             break;
                         case "hostCar Score":
                             _hostCar.Score = Convert.ToDouble(whichServerInformation[1]);
@@ -228,7 +237,7 @@ namespace Carcrash.Game.OnlineGame
             _loop.Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
-            menu.PressEnterToContinue("leader boards");
+            menu.PressEnterToContinue("leader boards",23,40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);

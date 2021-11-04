@@ -1,28 +1,38 @@
 ﻿using System;
 using Carcrash.Game;
 using Carcrash.Options;
+using System.Threading;
 
 namespace Carcrash
 {
     class Menu
     {
+        private OptionsMenu optionsMenu = new OptionsMenu();
+        public Settings _settings;
+        private bool _isMusicRunningAlready;
 
+        private static readonly BackGroundMusic BackGroundMusic = new BackGroundMusic();
+        private readonly Thread _playBackgroundMusic = new Thread(BackGroundMusic.PlaySong);
+
+        public Menu()
+        {
+            _settings = optionsMenu.Deserialize(optionsMenu.FilePath);
+        }
         static void Main()
         {
             var menu = new Menu();
-            var optionsMenu = new OptionsMenu();
-            var settings = optionsMenu.Deserialize(optionsMenu.FilePath);
-            Console.ForegroundColor = settings.Color;
-            menu.Start(settings);
+            Console.ForegroundColor = menu._settings.Color;
+            menu._playBackgroundMusic.Start();
+            menu.Start(menu._settings);
         }
 
         public void Start(Settings settings)
         {
+            _settings = settings;
             Console.CursorVisible = false;
             DrawMenuScreen();
             ExecuteSelection(SelectionProcess(15, 19, 4, 17), settings);
         }
-
 
         private static void DrawMenuScreen()
         {
@@ -127,9 +137,9 @@ namespace Carcrash
             }
         }
 
-        public void PressEnterToContinue(string destination)
+        public void PressEnterToContinue(string destination, int top,int left)
         {
-            Console.SetCursorPosition(40, 23);
+            Console.SetCursorPosition(left, top);
             Console.WriteLine("Press Enter to go to the " + destination + " OwO");
             while (Console.ReadKey(true).Key != ConsoleKey.Enter)
             {

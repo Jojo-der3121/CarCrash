@@ -10,8 +10,9 @@ namespace Carcrash
     class OptionsMenu
     {
         private Settings _settings = new Settings();
+        
         public readonly string FilePath;
-        private readonly Menu _menu = new Menu();
+        
         private GameLoop _gameLoop;
 
         public OptionsMenu()
@@ -32,7 +33,6 @@ namespace Carcrash
             _gameLoop = new GameLoop(_settings);
             DrawOptionMenu();
             SelectWhatToConfigurate();
-
         }
 
         private void DrawOptionMenu()
@@ -60,26 +60,27 @@ namespace Carcrash
 
         private void SelectWhatToConfigurate()
         {
-            var selection = _menu.SelectionProcess(9, 17, 3, 20);
+            var menu = new Menu();
+            var selection = menu.SelectionProcess(9, 17, 3, 20);
             switch (selection)
             {
                 case 9:
-                    EditDifficulty();
+                    EditDifficulty(menu);
                     break;
                 case 11:
-                    EditPlayerAmount();
+                    EditPlayerAmount(menu);
                     break;
                 case 13:
-                    EditSound();
+                    EditSound(menu);
                     break;
                 case 15:
-                    EditColor();
+                    EditColor(menu);
                     break;
                 case 17:
                     Console.Clear();
                     LeaderBoard.Serialize(_settings, FilePath);
                     _settings = Deserialize(FilePath);
-                    _menu.Start(_settings);
+                    menu.Start(_settings);
                     break;
             }
         }
@@ -113,10 +114,10 @@ namespace Carcrash
             _gameLoop.Draw(35, 19, tableList);
         }
 
-        private void EditDifficulty()
+        private void EditDifficulty(Menu menu)
         {
             DrawTable( "Difficulty:  ", "  Hard  ", " Medium ", "  Easy  ");
-            var selection = _menu.SelectionProcess(11, 15, 39, 49);
+            var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.DifficultyLevel = selection switch
             {
                 11 => 0,
@@ -129,10 +130,10 @@ namespace Carcrash
 
         }
 
-        private void EditPlayerAmount()
+        private void EditPlayerAmount(Menu menu)
         {
             DrawTable( "Player Amount", "1P(local) ", "2P(online)", "          ");
-            var selection = _menu.SelectionProcess(11, 13, 39, 51);
+            var selection = menu.SelectionProcess(11, 13, 39, 51);
             _settings.PlayMode = selection switch
             {
                 11 => PlayMode.SinglePlayer,
@@ -145,14 +146,14 @@ namespace Carcrash
 
         }
 
-        private void EditSound()
+        private void EditSound(Menu menu)
         {
-            DrawTable( "Sound:       ", "  Loud  ", "  Soft  ", "  Mute  ");
-            var selection = _menu.SelectionProcess(11, 15, 39, 49);
+            DrawTable( "Sound:       ", "  High  ", "  Deep  ", "  Mute  ");
+            var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.Sound = selection switch
             {
-                11 => 2,
-                13 => 1,
+                11 => 750,
+                13 => 350,
                 15 => 0,
                 _ => _settings.Sound
             };
@@ -160,10 +161,10 @@ namespace Carcrash
             Configurate(_settings);
         }
 
-        private void EditColor()
+        private void EditColor(Menu menu)
         {
             DrawTable( "Color :      ",  " DarkRed", "DarkCyan", "  White ");
-            var selection = _menu.SelectionProcess(11, 15, 39, 49);
+            var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.Color = selection switch
             {
                 11 => ConsoleColor.DarkRed,

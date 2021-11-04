@@ -35,28 +35,45 @@ namespace Carcrash
 
         public void CreateLeaderBoard(double score, Settings settings)
         {
+
+            DrawHeadLine();
             _settings = settings;
+            var loop = new GameLoop(_settings);
             FilePath = GetFilePath();
             CreateTable();
+            loop.Draw(45, 20, _tableDesign);
             _leaderBoardEntries.AddRange(Deserialize(FilePath));
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             FillTable(_leaderBoardEntries);
             var leaderBoardEntry = new LeaderBoardEntry();
-            Console.SetCursorPosition(2, 3);
+            Console.SetCursorPosition(6, 6);
             Console.WriteLine("Your Score:" + score);
-            Console.SetCursorPosition(2, 4);
+            Console.SetCursorPosition(6, 7);
             Console.WriteLine("please Enter Your Name! UwU");
-            Console.SetCursorPosition(2, 5);
+            Console.SetCursorPosition(4, 9);
             leaderBoardEntry.Name = Console.ReadLine();
             leaderBoardEntry.Score = score;
             _leaderBoardEntries.Add(leaderBoardEntry);
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
-            CreateTable();
+            loop.Draw(45, 20, _tableDesign);
             FillTable(_leaderBoardEntries);
             Serialize(_leaderBoardEntries, FilePath);
             var menu = new Menu();
-            menu.PressEnterToContinue("main menu");
+            menu.PressEnterToContinue("main menu",23,47);
             menu.Start(_settings);
+        }
+
+        private void DrawHeadLine()
+        {
+            var headLine = new List<string>
+            {
+                "════════════════└─┘════════════│═════════",
+                "└──└──└─┴└─┘││ │└─┤  │  └─└─┴└─┤└── │ └─┘",
+                "│  ┌─┐┌─┐┌─┤.├─┐┌─┐  ├─┘│ ┌─┐   ┌─┐ ┌─└─┐",
+                "│          │         ┌─┐│             ┌─┐"
+            };
+            var loop = new GameLoop(_settings);
+            loop.Draw(2, 4, headLine);
         }
 
         private void CreateTable()
@@ -82,9 +99,6 @@ namespace Carcrash
             _tableDesign.Add("╠═════════════════════════════════════╬══════════════════════════════════╣");
             _tableDesign.Add("║ Name:                               ║ Score:                           ║");
             _tableDesign.Add("╔═════════════════════════════════════╦══════════════════════════════════╗");
-
-            var gameLoop = new GameLoop(_settings);
-            gameLoop.Draw(35, 20, _tableDesign);
         }
 
         private void FillTable(List<LeaderBoardEntry> leaderBoardEntryList)
@@ -98,14 +112,14 @@ namespace Carcrash
             for (var i = 0; i < howManyEntriesWillBeDrawn; i++)
             {
                 var leaderBoardEntry = leaderBoardEntryList[i];
-                Console.SetCursorPosition(36, y);
+                Console.SetCursorPosition(46, y);
                 var name = leaderBoardEntry.Name;
                 if (name.Length > 36)
                 {
                     name = name.Truncate(33);
                 }
                 Console.WriteLine(name);
-                Console.SetCursorPosition(36 + 38, y);
+                Console.SetCursorPosition(46 + 38, y);
                 Console.WriteLine(leaderBoardEntry.Score);
                 y += 2;
             }

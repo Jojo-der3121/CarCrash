@@ -32,8 +32,9 @@ namespace Carcrash
         }
 
         public void SinglePlayerLoop()
-        {
+        { 
             Console.CursorVisible = false;
+            Tutorial();
             while (true)
             {
                 Draw(0, _groundList.Count - 1, _groundList);
@@ -60,7 +61,34 @@ namespace Carcrash
                     break;
                 }
             }
+            if (_settings.Sound != 0)
+            {
+                Console.Beep(_settings.Sound, 1350);
+            }
             Die(_car1.Score / ScoreDivider);
+        }
+
+        private void Tutorial()
+        {
+            Console.SetCursorPosition(35, 5);
+            Console.WriteLine("Please use :");
+            var tutorial = new List<string>
+            {
+                "╚═════╩═════╩═════╝",
+                "║ ║ ║ │ ╙─╜ │ ╙─┘ ║",
+                "║ ╟─╢ │ ╙─╖ │ ║ │ ║",
+                "║ ╔═╗ │ ╓─╖ │ ╓─┐ ║",
+                "╔════╩╦─────╬═════╗",
+                "     ║ ║/\\║ ║",
+                "     ║ ║  ║ ║",
+                "     ║      ║",
+                "     ╔══════╗"
+            };
+            Draw(45, 18, tutorial);
+            Console.SetCursorPosition(55,21);
+            Console.WriteLine("to move.");
+            Thread.Sleep(3000);
+            Console.Clear();
         }
 
         private List<string> FillGroundList()
@@ -145,7 +173,7 @@ namespace Carcrash
             Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
-            menu.PressEnterToContinue("leader boards");
+            menu.PressEnterToContinue("leader boards",23,40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);
