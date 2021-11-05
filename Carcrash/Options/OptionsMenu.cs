@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using Carcrash.Game;
 using Carcrash.Options;
 using Newtonsoft.Json;
@@ -51,19 +50,19 @@ namespace Carcrash
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("");
-            Console.WriteLine("   >>   GameMode    <<");
+            Console.WriteLine("   >>    GameMode   <<");
             Console.WriteLine("");
             Console.WriteLine("        Joining IP");
             Console.WriteLine("");
             Console.WriteLine("        Difficulty");
             Console.WriteLine("");
-            Console.WriteLine("         Color");
+            Console.WriteLine("          Color");
             Console.WriteLine("");
-            Console.WriteLine("         Sound");
+            Console.WriteLine("          Sound");
             Console.WriteLine("");
-            Console.WriteLine("         Songs");
+            Console.WriteLine("          Songs");
             Console.WriteLine("");
-            Console.WriteLine("         Back");
+            Console.WriteLine("          Back");
 
         }
 

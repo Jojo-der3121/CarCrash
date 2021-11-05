@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -23,7 +22,6 @@ namespace Carcrash.Game.OnlineGame
         private const int LeftRoadLeftBoarder = 2;
         private const int LeftRoadRightBoarder = 2 + 19;
         private const int ExtraScore = 9;
-        private const int NoDeviation = 0;
         private const int LeftRoadMiddleOfLeftLane = 10;
         private const int LeftRoadMiddleOfRightLane = 29;
         private const int RightRoadMiddleOfLeftLane = 53;

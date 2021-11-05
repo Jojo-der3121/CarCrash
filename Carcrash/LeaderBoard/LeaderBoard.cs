@@ -17,6 +17,8 @@ namespace Carcrash
         private string GetFilePath()
         {
             var whichDifficulty = "";
+            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
+            var path = "";
             switch (_settings.DifficultyLevel)
             {
                 case 0:
@@ -29,8 +31,6 @@ namespace Carcrash
                     whichDifficulty = "Easy";
                     break;
             }
-            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            var path = "";
             for (var i = 0; i < directory.Length - 1; i++)
             {
                 path += directory[i];
@@ -41,34 +41,39 @@ namespace Carcrash
 
         public void CreateLeaderBoard(double score, Settings settings)
         {
-
-            DrawHeadLine();
             _settings = settings;
             var loop = new GameLoop(_settings);
+            var menu = new Menu();
+
+            DrawHeadLine();
             FilePath = GetFilePath();
             CreateTable();
             loop.Draw(45, 20, _tableDesign);
             _leaderBoardEntries.AddRange(Deserialize(FilePath));
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             FillTable(_leaderBoardEntries);
-            var leaderBoardEntry = new LeaderBoardEntry();
-            Console.SetCursorPosition(6, 6);
-            Console.WriteLine("Your Score:" + score);
-            Console.SetCursorPosition(6, 7);
-            Console.WriteLine("please Enter Your Name! UwU");
-            Console.SetCursorPosition(4, 9);
-            leaderBoardEntry.Name = Console.ReadLine();
-            leaderBoardEntry.Score = score;
-            _leaderBoardEntries.Add(leaderBoardEntry);
+            _leaderBoardEntries.Add(NewLeaderBoardEntryInput(score));
             _leaderBoardEntries = SortLeaderBoardEntryList(_leaderBoardEntries);
             loop.Draw(45, 20, _tableDesign);
             FillTable(_leaderBoardEntries);
             Serialize(_leaderBoardEntries, FilePath);
-            var menu = new Menu();
-            menu.PressEnterToContinue("main menu",23,47);
+            menu.PressEnterToContinue("main menu", 23, 47);
             menu.Start(_settings);
         }
 
+        private LeaderBoardEntry NewLeaderBoardEntryInput(double score)
+        {
+            var leaderBoardEntry = new LeaderBoardEntry();
+
+            Console.SetCursorPosition(6, 6);
+            Console.WriteLine("Your Score:" + score);
+            Console.SetCursorPosition(6, 7);
+            Console.WriteLine("please Enter Your Name! UwU");
+            Console.SetCursorPosition(6, 9);
+            leaderBoardEntry.Name = Console.ReadLine();
+            leaderBoardEntry.Score = score;
+            return leaderBoardEntry;
+        }
         private void DrawHeadLine()
         {
             var headLine = new List<string>
@@ -149,6 +154,7 @@ namespace Carcrash
             var content = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<IEnumerable<LeaderBoardEntry>>(content);
         }
+
     }
 
 }
