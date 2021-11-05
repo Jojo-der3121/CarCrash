@@ -36,7 +36,7 @@ namespace Carcrash
             _settings = settings;
             _gameLoop = new GameLoop(_settings);
             DrawOptionMenu();
-            SelectWhatToConfigurate();
+            SelectWhatToConfigure();
         }
 
         private void DrawOptionMenu()
@@ -66,7 +66,7 @@ namespace Carcrash
 
         }
 
-        private void SelectWhatToConfigurate()
+        private void SelectWhatToConfigure()
         {
             var menu = new Menu();
             var selection = menu.SelectionProcess(9, 21, 3, 20);
@@ -99,7 +99,7 @@ namespace Carcrash
             }
         }
 
-        private void DrawTable(string WhatIsEdited, string option1, string option2, string option3)
+        private void DrawTable(string whatIsEdited, string option1, string option2, string option3)
         {
             var frame = "";
             var whiteSpace = "";
@@ -109,7 +109,7 @@ namespace Carcrash
                 whiteSpace = String.Concat(whiteSpace, " ");
             }
 
-            var titleWhiteSpace = whiteSpace.Remove(whiteSpace.Length - WhatIsEdited.Length + 5);
+            var titleWhiteSpace = whiteSpace.Remove(whiteSpace.Length - whatIsEdited.Length + 5);
             var tableList = new List<string>
             {
                 "╚═────"+frame+"────═╝",
@@ -122,7 +122,7 @@ namespace Carcrash
                 "│     "+whiteSpace+"     │",
                 "│   >>"+option1+"<<   │",
                 "│     "+whiteSpace+"     │",
-                "│Edit "+WhatIsEdited+titleWhiteSpace+"│",
+                "│Edit "+whatIsEdited+titleWhiteSpace+"│",
                 "╔═────"+frame+"────═╗"
             };
             _gameLoop.Draw(35, 19, tableList);
@@ -148,7 +148,7 @@ namespace Carcrash
             {
                 11 => 0,
                 13 => 1,
-                15 => 5,
+                15 => 7,
                 _ => _settings.DifficultyLevel
             };
             Console.Clear();

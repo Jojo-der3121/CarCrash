@@ -6,29 +6,29 @@ namespace Carcrash
 {
     class Car
     {
-
-        public List<int> ObjectDimensions;
-        public ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
+        public readonly ObjectSizeAndLocation ObjectSizeAndLocation = new ObjectSizeAndLocation();
         public double Score = 0;
-        public bool _dead = false;
-        private int _difficulty;
-        public List<string> Design;
+        public bool Dead = false;
+        private readonly int _difficulty;
+        public readonly List<string> Design;
 
         public Car(int left, int designIndex, int difficulty)
         {
             _difficulty = difficulty;
             Design = AutoModel(designIndex);
-            ObjectDimensions = FillCollisionDimensions();
+            var objectDimensions = FillCollisionDimensions();
             ObjectSizeAndLocation.Left = left;
             ObjectSizeAndLocation.Top = 26;
-            ObjectSizeAndLocation.CollisionDimensions = ObjectDimensions;
+            ObjectSizeAndLocation.CollisionDimensions = objectDimensions;
         }
 
         private List<int> FillCollisionDimensions()
         {
-            var cacheList = new List<int>();
-            cacheList.Add(Design[0].Length);
-            cacheList.Add(Design.Count);
+            var cacheList = new List<int>
+            {
+                Design[0].Length,
+                Design.Count
+            };
             return cacheList;
         }
 
@@ -60,7 +60,7 @@ namespace Carcrash
 
         public void Steer()
         {
-            if (!_dead)
+            if (!Dead)
             {
                 if (Console.KeyAvailable)
                 {
@@ -85,7 +85,7 @@ namespace Carcrash
                             break;
                         case ConsoleKey.A:
                         case ConsoleKey.LeftArrow:
-                            ObjectSizeAndLocation.Left -= 4 + _difficulty;
+                            ObjectSizeAndLocation.Left -= 2 + _difficulty;
                             if (ObjectSizeAndLocation.Left < 0)
                             {
                                 ObjectSizeAndLocation.Left += Math.Abs(ObjectSizeAndLocation.Left);
@@ -93,7 +93,7 @@ namespace Carcrash
                             break;
                         case ConsoleKey.D:
                         case ConsoleKey.RightArrow:
-                            ObjectSizeAndLocation.Left += 4 + _difficulty;
+                            ObjectSizeAndLocation.Left += 2 + _difficulty;
                             if (ObjectSizeAndLocation.Left > 114)
                             {
                                 ObjectSizeAndLocation.Left = 114;

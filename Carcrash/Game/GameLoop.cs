@@ -31,45 +31,9 @@ namespace Carcrash
             _groundList = FillGroundList();
         }
 
-        public void SinglePlayerLoop()
-        { 
-            Console.CursorVisible = false;
-            Tutorial();
-            while (true)
-            {
-                Draw(0, _groundList.Count - 1, _groundList);
-                Console.SetCursorPosition(95, 27);
-                Console.Write(_car1.Score / ScoreDivider);
-                Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
-                Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
-                _road.Movement();
-                if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
-                {
-                    _enemyCar1.Movement(NoDeviation);
-                    Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
-                }
-                _car1.Steer();
-                _car1.Score++;
-                Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
-                Thread.Sleep(10);
-                if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder)
-                {
-                    _car1.Score += ExtraScore;
-                }
-                if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
-                {
-                    break;
-                }
-            }
-            if (_settings.Sound != 0)
-            {
-                Console.Beep(_settings.Sound, 1350);
-            }
-            Die(_car1.Score / ScoreDivider);
-        }
-
-        private void Tutorial()
+        public void Tutorial()
         {
+
             Console.SetCursorPosition(35, 5);
             Console.WriteLine("Please use :");
             var tutorial = new List<string>
@@ -85,10 +49,54 @@ namespace Carcrash
                 "     ╔══════╗"
             };
             Draw(45, 18, tutorial);
-            Console.SetCursorPosition(55,21);
+            Console.SetCursorPosition(55, 21);
             Console.WriteLine("to move.");
             Thread.Sleep(3000);
             Console.Clear();
+            SinglePlayerLoop();
+        }
+
+        private void SinglePlayerLoop()
+        {
+            while (true)
+            {
+                Draw(0, _groundList.Count - 1, _groundList);
+                Console.SetCursorPosition(95, 27);
+                Console.Write(_car1.Score / ScoreDivider);
+                Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
+                Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
+                _road.Movement();
+                if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
+                {
+                    _enemyCar1.Movement(NoDeviation);
+                    Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
+                }
+                _car1.Steer();
+                Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
+                GiveScore();
+                if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
+                {
+                    break;
+                }
+            }
+            if (_settings.Sound != 0)
+            {
+                Console.Beep(_settings.Sound, 1350);
+            }
+            Die(_car1.Score / ScoreDivider);
+        }
+
+        private void GiveScore()
+        {
+            if (_car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder - 5 && _car1.ObjectSizeAndLocation.Left < RightRoadLeftBoarder + 35)
+            {
+                _car1.Score++;
+            }
+            Thread.Sleep(10);
+            if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder-2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder-5)
+            {
+                _car1.Score += ExtraScore;
+            }
         }
 
         private List<string> FillGroundList()
@@ -173,7 +181,7 @@ namespace Carcrash
             Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
-            menu.PressEnterToContinue("leader boards",23,40);
+            menu.PressEnterToContinue("leader boards", 23, 40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);

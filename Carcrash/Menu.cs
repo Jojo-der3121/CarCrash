@@ -7,17 +7,17 @@ namespace Carcrash
 {
     class Menu
     {
-        private OptionsMenu optionsMenu = new OptionsMenu();
+        private readonly OptionsMenu _optionsMenu = new OptionsMenu();
         public Settings _settings;
-        private bool _isMusicRunningAlready;
 
         private static readonly BackGroundMusic BackGroundMusic = new BackGroundMusic();
         private readonly Thread _playBackgroundMusic = new Thread(BackGroundMusic.PlaySong);
 
         public Menu()
         {
-            _settings = optionsMenu.Deserialize(optionsMenu.FilePath);
+            _settings = _optionsMenu.Deserialize(_optionsMenu.FilePath);
         }
+
         static void Main()
         {
             var menu = new Menu();
@@ -157,7 +157,7 @@ namespace Carcrash
             var loop = new GameLoop(settings);
             if (settings.PlayMode == PlayMode.SinglePlayer)
             {
-                loop.SinglePlayerLoop();
+                loop.Tutorial();
             }
             else
             {

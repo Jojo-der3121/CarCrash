@@ -27,7 +27,7 @@ namespace Carcrash
                 case 1:
                     whichDifficulty = "Medium";
                     break;
-                case 5:
+                case 7:
                     whichDifficulty = "Easy";
                     break;
             }

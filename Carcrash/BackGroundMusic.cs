@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Carcrash.Game;
 
 
 namespace Carcrash
@@ -14,21 +15,30 @@ namespace Carcrash
                 {
                     var menu = new Menu();
                     var settings = menu._settings;
-                    if (settings.Sound != 0)
+                    if (settings.PlayMode != PlayMode.MultiPlayer)
                     {
-                        switch (settings.WhichSong)
+                        if (settings.Sound != 0)
                         {
-                            case 1:
-                                Song1();
-                                break;
-                            case 2:
-                                Song2();
-                                break;
-                            case 3:
-                                Song3();
-                                break;
+                            switch (settings.WhichSong)
+                            {
+                                case 1:
+                                    Song1();
+                                    break;
+                                case 2:
+                                    Song2();
+                                    break;
+                                case 3:
+                                    Song3();
+                                    break;
+                            }
                         }
                     }
+                    else
+                    {
+                        Mute();
+                    }
+
+
                 }
                 catch
                 {
@@ -252,6 +262,11 @@ namespace Carcrash
         private void Song3()
         {
             Console.Beep(1320, 500); Console.Beep(990, 250); Console.Beep(1056, 250); Console.Beep(1188, 250); Console.Beep(1320, 125); Console.Beep(1188, 125); Console.Beep(1056, 250); Console.Beep(990, 250); Console.Beep(880, 500); Console.Beep(880, 250); Console.Beep(1056, 250); Console.Beep(1320, 500); Console.Beep(1188, 250); Console.Beep(1056, 250); Console.Beep(990, 750); Console.Beep(1056, 250); Console.Beep(1188, 500); Console.Beep(1320, 500); Console.Beep(1056, 500); Console.Beep(880, 500); Console.Beep(880, 500); System.Threading.Thread.Sleep(250); Console.Beep(1188, 500); Console.Beep(1408, 250); Console.Beep(1760, 500); Console.Beep(1584, 250); Console.Beep(1408, 250); Console.Beep(1320, 750); Console.Beep(1056, 250); Console.Beep(1320, 500); Console.Beep(1188, 250); Console.Beep(1056, 250); Console.Beep(990, 500); Console.Beep(990, 250); Console.Beep(1056, 250); Console.Beep(1188, 500); Console.Beep(1320, 500); Console.Beep(1056, 500); Console.Beep(880, 500); Console.Beep(880, 500); System.Threading.Thread.Sleep(500); PlaySong();
+        }
+
+        private void Mute()
+        {
+            Thread.Sleep(10000);
         }
 
     }
