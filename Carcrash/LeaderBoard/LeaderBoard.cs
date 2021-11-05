@@ -30,7 +30,13 @@ namespace Carcrash
                     break;
             }
             var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            return directory[0] += "Carcrash\\Carcrash\\LeaderBoard\\CarCrashLeaderBoard" + whichDifficulty + ".json";
+            var path = "";
+            for (var i = 0; i < directory.Length - 1; i++)
+            {
+                path += directory[i];
+                path += "Carcrash";
+            }
+            return path += "\\LeaderBoard\\CarCrashLeaderBoard" + whichDifficulty + ".json";
         }
 
         public void CreateLeaderBoard(double score, Settings settings)

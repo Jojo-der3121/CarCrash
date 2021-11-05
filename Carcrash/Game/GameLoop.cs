@@ -98,11 +98,11 @@ namespace Carcrash
             {
                 groundListModel.Add("                                            ║                 ║║                 ║                                       ");
             }
-            groundListModel[5] = groundListModel[7].Insert(95, "Score:").Remove(118);
+            groundListModel[5] = groundListModel[7].Insert(95, "Score:").Remove(120);
             return groundListModel;
         }
 
-        private bool CalculateCollision(ObjectSizeAndLocation objectSizeAndLocationA, ObjectSizeAndLocation objectSizeAndLocationB)
+        public bool CalculateCollision(ObjectSizeAndLocation objectSizeAndLocationA, ObjectSizeAndLocation objectSizeAndLocationB)
         {
             var locationsObjectA = CreateLocationList(objectSizeAndLocationA.CollisionDimensions, objectSizeAndLocationA.Top, objectSizeAndLocationA.Left);
             var locationsObjectB = CreateLocationList(objectSizeAndLocationB.CollisionDimensions, objectSizeAndLocationB.Top, objectSizeAndLocationB.Left);
@@ -152,7 +152,7 @@ namespace Carcrash
 
         }
 
-        private void Die(double score)
+        public void Die(double score)
         {
             Console.Clear();
             var deathMessage = new List<string>()

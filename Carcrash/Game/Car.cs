@@ -53,6 +53,7 @@ namespace Carcrash
                     autoModel.Add("  p2  ");
                     break;
             }
+
             autoModel.Reverse();
             return autoModel;
         }
@@ -67,25 +68,40 @@ namespace Carcrash
                     var key = new ConsoleKeyInfo();
                     while (Console.KeyAvailable)
                         key = Console.ReadKey(true);
-
-                    if (key.Key == ConsoleKey.W && ObjectSizeAndLocation.Top > 0)
+                    switch (key.Key)
                     {
-                        ObjectSizeAndLocation.Top--;
-                    }
-                    else if (key.Key == ConsoleKey.S && ObjectSizeAndLocation.Top < 29)
-                    {
-                        ObjectSizeAndLocation.Top++;
-                    }
-                    else if (key.Key == ConsoleKey.A && ObjectSizeAndLocation.Left > 3)
-                    {
-                        ObjectSizeAndLocation.Left -= 4 + _difficulty;
-                    }
-                    else if (key.Key == ConsoleKey.D && ObjectSizeAndLocation.Left < 110)
-                    {
-                        ObjectSizeAndLocation.Left += 4 + _difficulty;
+                        case ConsoleKey.W:
+                        case ConsoleKey.UpArrow:
+                            if (ObjectSizeAndLocation.Top > 0)
+                            {
+                                ObjectSizeAndLocation.Top--;
+                            }
+                            break;
+                        case ConsoleKey.S:
+                        case ConsoleKey.DownArrow:
+                            if (ObjectSizeAndLocation.Top < 29)
+                            {
+                                ObjectSizeAndLocation.Top++;
+                            }
+                            break;
+                        case ConsoleKey.A:
+                        case ConsoleKey.LeftArrow:
+                            ObjectSizeAndLocation.Left -= 4 + _difficulty;
+                            if (ObjectSizeAndLocation.Left < 0)
+                            {
+                                ObjectSizeAndLocation.Left += Math.Abs(ObjectSizeAndLocation.Left);
+                            }
+                            break;
+                        case ConsoleKey.D:
+                        case ConsoleKey.RightArrow:
+                            ObjectSizeAndLocation.Left += 4 + _difficulty;
+                            if (ObjectSizeAndLocation.Left > 114)
+                            {
+                                ObjectSizeAndLocation.Left = 114;
+                            }
+                            break;
                     }
                 }
-               
             }
             else if (ObjectSizeAndLocation.Top < 37)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
 using Carcrash.Game;
 using Carcrash.Options;
 using Newtonsoft.Json;
@@ -10,9 +11,7 @@ namespace Carcrash
     class OptionsMenu
     {
         private Settings _settings = new Settings();
-        
         public readonly string FilePath;
-        
         private GameLoop _gameLoop;
 
         public OptionsMenu()
@@ -23,7 +22,13 @@ namespace Carcrash
         private string GetFilePath()
         {
             var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            return directory[0] += "Carcrash\\Carcrash\\Options\\CarCrashSettings.json";
+            var path = "";
+            for (var i = 0; i < directory.Length - 1; i++)
+            {
+                path += directory[i];
+                path += "Carcrash";
+            }
+            return path += "\\Options\\CarCrashSettings.json";
         }
 
 
@@ -46,13 +51,17 @@ namespace Carcrash
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("");
-            Console.WriteLine("   >>   Difficulty  <<");
+            Console.WriteLine("   >>   GameMode    <<");
             Console.WriteLine("");
-            Console.WriteLine("        GameMode");
+            Console.WriteLine("        Joining IP");
+            Console.WriteLine("");
+            Console.WriteLine("        Difficulty");
+            Console.WriteLine("");
+            Console.WriteLine("         Color");
             Console.WriteLine("");
             Console.WriteLine("         Sound");
             Console.WriteLine("");
-            Console.WriteLine("         Color");
+            Console.WriteLine("         Songs");
             Console.WriteLine("");
             Console.WriteLine("         Back");
 
@@ -61,22 +70,28 @@ namespace Carcrash
         private void SelectWhatToConfigurate()
         {
             var menu = new Menu();
-            var selection = menu.SelectionProcess(9, 17, 3, 20);
+            var selection = menu.SelectionProcess(9, 21, 3, 20);
             switch (selection)
             {
                 case 9:
-                    EditDifficulty(menu);
-                    break;
-                case 11:
                     EditPlayerAmount(menu);
                     break;
+                case 11:
+                    EditIpToConnectTo(menu);
+                    break;
                 case 13:
-                    EditSound(menu);
+                    EditDifficulty(menu);
                     break;
                 case 15:
                     EditColor(menu);
                     break;
                 case 17:
+                    EditSound(menu);
+                    break;
+                case 19:
+                    EditSongSelection(menu);
+                    break;
+                case 21:
                     Console.Clear();
                     LeaderBoard.Serialize(_settings, FilePath);
                     _settings = Deserialize(FilePath);
@@ -85,17 +100,17 @@ namespace Carcrash
             }
         }
 
-        private void DrawTable( string WhatIsEdited, string option1, string option2, string option3)
+        private void DrawTable(string WhatIsEdited, string option1, string option2, string option3)
         {
             var frame = "";
             var whiteSpace = "";
             for (var i = 0; i < option3.Length; i++)
             {
                 frame = String.Concat(frame, "─");
-                whiteSpace = String.Concat(whiteSpace," ");
+                whiteSpace = String.Concat(whiteSpace, " ");
             }
 
-            var titleWhiteSpace = whiteSpace.Remove(whiteSpace.Length - WhatIsEdited.Length+5);
+            var titleWhiteSpace = whiteSpace.Remove(whiteSpace.Length - WhatIsEdited.Length + 5);
             var tableList = new List<string>
             {
                 "╚═────"+frame+"────═╝",
@@ -114,9 +129,21 @@ namespace Carcrash
             _gameLoop.Draw(35, 19, tableList);
         }
 
+        private void EditIpToConnectTo(Menu menu)
+        {
+            Console.SetCursorPosition(40,10);
+            Console.WriteLine("Please Enter the Ip-Address! :D");
+            Console.SetCursorPosition(39,11);
+            Console.WriteLine("═══════════════════════════════════");
+            Console.SetCursorPosition(45,14);
+            _settings.Ip = Console.ReadLine();
+            Console.Clear();
+            Configurate(_settings);
+        }
+
         private void EditDifficulty(Menu menu)
         {
-            DrawTable( "Difficulty:  ", "  Hard  ", " Medium ", "  Easy  ");
+            DrawTable("Difficulty:  ", "  Hard  ", " Medium ", "  Easy  ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.DifficultyLevel = selection switch
             {
@@ -132,7 +159,7 @@ namespace Carcrash
 
         private void EditPlayerAmount(Menu menu)
         {
-            DrawTable( "Player Amount", "1P(local) ", "2P(online)", "          ");
+            DrawTable("Player Amount", "1P(local) ", "2P(online)", "          ");
             var selection = menu.SelectionProcess(11, 13, 39, 51);
             _settings.PlayMode = selection switch
             {
@@ -142,13 +169,11 @@ namespace Carcrash
             };
             Console.Clear();
             Configurate(_settings);
-
-
         }
 
         private void EditSound(Menu menu)
         {
-            DrawTable( "Sound:       ", "  High  ", "  Deep  ", "  Mute  ");
+            DrawTable("Sound:       ", "  High  ", "  Deep  ", "  Mute  ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.Sound = selection switch
             {
@@ -161,9 +186,24 @@ namespace Carcrash
             Configurate(_settings);
         }
 
+        private void EditSongSelection(Menu menu)
+        {
+            DrawTable("Song:        ", "  Alle meine Entchen   ", "Super Mario Bros. Theme", "        Tetris         ");
+            var selection = menu.SelectionProcess(11, 15, 39, 39 + 25);
+            _settings.WhichSong = selection switch
+            {
+                11 => 1,
+                13 => 2,
+                15 => 3,
+                _ => _settings.WhichSong
+            };
+            Console.Clear();
+            Configurate(_settings);
+        }
+
         private void EditColor(Menu menu)
         {
-            DrawTable( "Color :      ",  " DarkRed", "DarkCyan", "  White ");
+            DrawTable("Color :      ", " DarkRed", "DarkCyan", "  White ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
             _settings.Color = selection switch
             {
@@ -180,7 +220,7 @@ namespace Carcrash
         public Settings Deserialize(string filePath)
         {
             var content = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject <Settings>(content);
+            return JsonConvert.DeserializeObject<Settings>(content);
         }
     }
 }
