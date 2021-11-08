@@ -22,7 +22,7 @@ namespace Carcrash
         {
             var menu = new Menu();
             Console.ForegroundColor = menu._settings.Color;
-            //menu._playBackgroundMusic.Start();
+            menu._playBackgroundMusic.Start();
             menu.Start(menu._settings);
         }
 

@@ -15,8 +15,8 @@ namespace Carcrash
                 {
                     var menu = new Menu();
                     var settings = menu._settings;
-                    if (settings.PlayMode != PlayMode.MultiPlayer)
-                    {
+                    //if (settings.PlayMode != PlayMode.MultiPlayer)
+                    //{
                         if (settings.Sound != 0)
                         {
                             switch (settings.WhichSong)
@@ -32,11 +32,11 @@ namespace Carcrash
                                     break;
                             }
                         }
-                    }
-                    else
-                    {
-                        Mute();
-                    }
+                    //}
+                    //else
+                    //{
+                    //    Mute();
+                    //}
 
 
                 }
