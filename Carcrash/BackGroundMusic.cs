@@ -15,8 +15,7 @@ namespace Carcrash
                 {
                     var menu = new Menu();
                     var settings = menu._settings;
-                    //if (settings.PlayMode != PlayMode.MultiPlayer)
-                    //{
+                    
                         if (settings.Sound != 0)
                         {
                             switch (settings.WhichSong)
@@ -32,13 +31,6 @@ namespace Carcrash
                                     break;
                             }
                         }
-                    //}
-                    //else
-                    //{
-                    //    Mute();
-                    //}
-
-
                 }
                 catch
                 {
@@ -107,7 +99,6 @@ namespace Carcrash
             Thread.Sleep(miniPause);
             Console.Beep(f, pause);
             Thread.Sleep(miniPause);
-
 
             Console.Beep(eSmall, pause);
             Thread.Sleep(2 * miniPause);
@@ -263,11 +254,5 @@ namespace Carcrash
         {
             Console.Beep(1320, 500); Console.Beep(990, 250); Console.Beep(1056, 250); Console.Beep(1188, 250); Console.Beep(1320, 125); Console.Beep(1188, 125); Console.Beep(1056, 250); Console.Beep(990, 250); Console.Beep(880, 500); Console.Beep(880, 250); Console.Beep(1056, 250); Console.Beep(1320, 500); Console.Beep(1188, 250); Console.Beep(1056, 250); Console.Beep(990, 750); Console.Beep(1056, 250); Console.Beep(1188, 500); Console.Beep(1320, 500); Console.Beep(1056, 500); Console.Beep(880, 500); Console.Beep(880, 500); System.Threading.Thread.Sleep(250); Console.Beep(1188, 500); Console.Beep(1408, 250); Console.Beep(1760, 500); Console.Beep(1584, 250); Console.Beep(1408, 250); Console.Beep(1320, 750); Console.Beep(1056, 250); Console.Beep(1320, 500); Console.Beep(1188, 250); Console.Beep(1056, 250); Console.Beep(990, 500); Console.Beep(990, 250); Console.Beep(1056, 250); Console.Beep(1188, 500); Console.Beep(1320, 500); Console.Beep(1056, 500); Console.Beep(880, 500); Console.Beep(880, 500); System.Threading.Thread.Sleep(500); PlaySong();
         }
-
-        private void Mute()
-        {
-            Thread.Sleep(10000);
-        }
-
     }
 }

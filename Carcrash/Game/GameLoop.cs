@@ -66,6 +66,7 @@ namespace Carcrash
                 GiveScore();
                 if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
                 {
+                    FillAnimationList(_car1.ObjectSizeAndLocation.Top,_car1.ObjectSizeAndLocation.Left);
                     break;
                 }
                 if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
@@ -221,6 +222,205 @@ namespace Carcrash
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);
+        }
+
+        private void FillAnimationList( int top, int left)
+        {
+            var frame1 = new List<string>
+            {
+                "\\ | /",
+                "-(@)-",
+                "/-|-\\"
+            };
+            frame1.Reverse();
+            var frame2 = new List<string>
+            {
+                " /-\\",
+                "(|&|)",
+                "\\---/"
+            };
+            frame2.Reverse();
+            var frame3 = new List<string>
+            {
+                "|-^-|",
+                "\\(φ)/",
+                " |´|",
+                "/-=-\\"
+            };
+            frame3.Reverse();
+            var frame4 = new List<string>
+            {
+                " _^|^_",
+                "/(=^=)\\",
+                "<:═|-;>",
+                "  |;|",
+                ".-═=═-.",
+                " /| ,\\",
+                "- - - -"
+            };
+            frame4.Reverse();
+            var frame5 = new List<string>
+            {
+                "   -~^~-",
+                " ( ^   ^ )",
+                "/≡ -   - ≡\\",
+                "<- .° ° ,->",
+                " -=═_ _═=-",
+                "  \\     /",
+                "   |   |",
+                ".-═=≡ ≡=═-.",
+                "  -\\   /-",
+                "   /| ;\\",
+                "-_-_-_-_-_-"
+            };
+            frame5.Reverse();
+            var frame6 = new List<string>
+            {
+                "    _~~~`~_-\\, _",
+                "   /  (     )- \\",
+                " ((             |",
+                " |  (  °   ))    )",
+                "\\.  ((        ), /",
+                "  ;\\\\~. - _ - / )`",
+                "      \\|| | /",
+                "       | ^ |",
+                " ,-═=≡&≡ φ ≡&≡=═-\\",
+                " ` - =≡| ≡ |═ -  ´",
+                "       /   \\",
+                "  - _-~ ~ ~_~_°",
+                " _°-_-_-_-_-_-;_-."
+
+            };
+            frame6.Reverse();
+            var frame7 = new List<string>
+            {
+                "   _~*;-^_",
+                "/ /^    |°\\ \\",
+                " ((    c) ))",
+                "  - -|- - -",
+                "    \\  |/",
+                "    ||  | ",
+                "     | |",
+                " .-═=≡ ≡=═-.",
+                "    -\\ /-",
+                "     | |",
+                "    /| ;\\",
+                " -_-_-_-_-_-"
+            };
+            frame7.Reverse();
+            var frame8 = new List<string>
+            {
+                "  /^~*;-_°\\",
+                "( (       ) )",
+                "  - -|- -/-",
+                "    /  |\\",
+                "    (  ;) ",
+                "     |",
+                "      \\",
+                "     /φ",
+                "    | |",
+                "    |||\\",
+                " .- ═ ═ -.",
+                "   /´ ,\\",
+                "  - - - -"
+            };
+            frame8.Reverse();
+            var frame9 = new List<string>
+            {
+                " _~ _-",
+                "/^ ~ )\\",
+                " (  ;)",
+                " \\|",
+                "   \\",
+                "   /",
+                "  `",
+                "",
+                "   ´",
+                "  /",
+                "  φ\\",
+                "  | |",
+                " /-=-\\ "
+            };
+            frame9.Reverse();
+            var frame10 = new List<string>
+            {
+                "  `",
+                "  /",
+                "  ,|",
+                ".| ,\\"
+
+            };
+            frame10.Reverse();
+            var frame11 = new List<string>
+            {
+                "  .",
+                "  /",
+                "_|\\"
+            };
+            frame11.Reverse();
+            var frame12 = new List<string>
+            {
+                "_;"
+            };
+            var frame13 = new List<string>
+            {
+                "\\"
+            };
+            //var animation = new List<List<string>>
+            //{
+            //    frame1,
+            //    frame2,
+            //    frame3,
+            //    frame4,
+            //    frame5,
+            //    frame6,
+            //    frame7,
+            //    frame8,
+            //    frame9,
+            //    frame10,
+            //    frame11,
+            //    frame12,
+            //    frame13
+            //};
+            Thread.Sleep(75);
+            Draw(left +3 - frame1[frame1.Count - 1].Length / 2, top-5, frame1);
+            Thread.Sleep(350);
+            Console.Clear();
+            Draw(left + 3 - frame2[frame2.Count - 1].Length / 2, top - 5, frame2);
+            Thread.Sleep(150);
+            Console.Clear();
+            Draw(left + 3 - frame3[frame3.Count - 1].Length / 2, top - 5, frame3);
+            Thread.Sleep(200);
+            Console.Clear();
+            Draw(left + 3 - frame4[frame4.Count - 1].Length / 2, top - 5, frame4);
+            Thread.Sleep(275);
+            Console.Clear();
+            Draw(left + 3 - frame5[frame5.Count - 1].Length / 2, top - 5, frame5);
+            Thread.Sleep(300);
+            Console.Clear();
+            Draw(left + 3 - frame6[frame6.Count - 1].Length / 2, top - 5, frame6);
+            Thread.Sleep(1000);
+            Console.Clear();
+            Draw(left + 3 - frame7[frame7.Count - 1].Length / 2, top - 5, frame7);
+            Thread.Sleep(500);
+            Console.Clear();
+            Draw(left + 3 - frame8[frame8.Count - 1].Length / 2, top - 5, frame8);
+            Thread.Sleep(100);
+            Console.Clear();
+            Draw(left + 3 - frame9[frame9.Count - 1].Length / 2, top -5, frame9);
+            Thread.Sleep(500);
+            Console.Clear();
+            Draw(left + 3 - frame10[frame10.Count - 1].Length / 2, top - 5, frame10);
+            Thread.Sleep(600);
+            Console.Clear();
+            Draw(left + 3 - frame11[frame11.Count - 1].Length / 2, top + 5, frame11);
+            Thread.Sleep(400);
+            Console.Clear();
+            Draw(left + 3 - frame12[frame12.Count - 1].Length / 2, top +5, frame12);
+            Thread.Sleep(100);
+            Console.Clear();
+            Draw(left + 3 - frame13[frame13.Count - 1].Length / 2, top + 5, frame13);
+            Thread.Sleep(200);
         }
     }
 }
