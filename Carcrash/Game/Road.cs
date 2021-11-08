@@ -4,7 +4,7 @@ namespace Carcrash
 {
     class Road
     {
-        public int _top = 30;
+        public int Top = 30;
         public List<string> Design;
 
         public Road()
@@ -26,10 +26,10 @@ namespace Carcrash
 
         public void Movement()
         {
-            _top++;
-            if (_top == 60)
+            Top++;
+            if (Top == 60)
             {
-                _top = 30;
+                Top = 30;
             }
         }
 

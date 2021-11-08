@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -32,6 +33,7 @@ namespace Carcrash.Game.OnlineGame
         private StreamReader _streamR;
         private StreamWriter _streamW;
         private readonly GameLoop _loop;
+        private readonly List<string> _efficientDrawFrameList = new List<string>();
 
         public Client(Settings settings)
         {
@@ -59,20 +61,8 @@ namespace Carcrash.Game.OnlineGame
             {
                 while (true)
                 {
-                    DrawGroundAndRoad();
-                    _loop.Draw(_hostCar.ObjectSizeAndLocation.Left, _hostCar.ObjectSizeAndLocation.Top, _hostCar.Design);
-                    _car1.Steer();
-                    _streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
-                    _streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
-                    _loop.Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
-                    DrawScores();
-                    if (_car1.Score > ScoreDivider + 250 || _hostCar.Score > ScoreDivider + 250)
-                    {
-                        _loop.Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
-                        _loop.Draw(_enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.Design);
-                    }
+                    EfficientDraw();
                     Thread.Sleep(10);
-                    _road.Movement();
                     if (!_car1.Dead)
                     {
                         CheckIfDeadAndGiveScore();
@@ -81,6 +71,10 @@ namespace Carcrash.Game.OnlineGame
                     {
                         Thread.Sleep(10);
                     }
+                    _car1.Steer();
+                    _streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
+                    _streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
+                    _road.Movement();
                     _streamW.WriteLine("clientCar deadStatus:" + _car1.Dead);
                     _streamW.WriteLine("clientCar Score:" + _car1.Score);
                     if (_car1.Dead && _hostCar.Dead)
@@ -180,34 +174,14 @@ namespace Carcrash.Game.OnlineGame
             {
                 groundListModel.Add(" ║                 ║║                 ║     ║                 ║║                 ║                                       ");
             }
-            groundListModel[5] = groundListModel[5].Insert(95, "Car2Score:").Remove(120);
-            groundListModel[8] = groundListModel[8].Insert(95, "Car1Score:").Remove(120);
+            groundListModel[26] = groundListModel[26].Insert(95, "Car2Score:").Remove(120);
+            groundListModel[23] = groundListModel[23].Insert(95, "Car1Score:").Remove(120);
             return groundListModel;
-        }
-
-        private void DrawGroundAndRoad()
-        {
-            _loop.Draw(0, _groundList.Count - 1, _groundList);
-            _loop.Draw(LeftRoadMiddleOfLeftLane, _road._top, _road.Design);
-            _loop.Draw(LeftRoadMiddleOfRightLane, _road._top, _road.Design);
-            _loop.Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
-            _loop.Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
-            _loop.Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
-
-        }
-
-        private void DrawScores()
-        {
-            Console.SetCursorPosition(ScoreBoardLeft, 27);
-            Console.Write(_hostCar.Score / ScoreDivider);
-            Console.SetCursorPosition(ScoreBoardLeft, 24);
-            Console.Write(_car1.Score / ScoreDivider);
-
         }
 
         private void CheckIfDeadAndGiveScore()
         {
-            if (_car1.ObjectSizeAndLocation.Left < LeftRoadRightBoarder-2 && _car1.ObjectSizeAndLocation.Left > LeftRoadLeftBoarder -5 && !_car1.Dead || _car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder -2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder -5 && !_car1.Dead)
+            if (_car1.ObjectSizeAndLocation.Left < LeftRoadRightBoarder - 2 && _car1.ObjectSizeAndLocation.Left > LeftRoadLeftBoarder - 5 && !_car1.Dead || _car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder - 2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder - 5 && !_car1.Dead)
             {
                 _car1.Score += ExtraScore;
             }
@@ -220,68 +194,51 @@ namespace Carcrash.Game.OnlineGame
                 _car1.Score++;
             }
         }
-        // die drei
-        //private List<string> CreateLocationList(List<int> dimensionList, int y, int x)
-        //{
-        //    var locationList = new List<string>();
-        //    var cacheList = new List<string>();
-        //    for (var i = 0; i < dimensionList[0]; i++)
-        //    {
-        //        cacheList.Add(Convert.ToString(y + i));
-        //        for (var e = 0; e < dimensionList[1]; e++)
-        //        {
-        //            locationList.Add(cacheList[i] + ":" + Convert.ToString(x + e));
-        //        }
 
-        //    }
-        //    return locationList;
-        //}
+        private void EfficientDraw()
+        {
+            _efficientDrawFrameList.Clear();
+            _efficientDrawFrameList.AddRange(_groundList);
+            AddToFrame(_road.Top, LeftRoadMiddleOfLeftLane, _road.Design);
+            AddToFrame(_road.Top, LeftRoadMiddleOfRightLane, _road.Design);
+            AddToFrame(_road.Top, RightRoadMiddleOfLeftLane, _road.Design);
+            AddToFrame(_road.Top, RightRoadMiddleOfRightLane, _road.Design);
+            AddToFrame(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _car1.Design);
+            AddToFrame(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _hostCar.Design);
+            if (_car1.Score > ScoreDivider || _hostCar.Score > ScoreDivider)
+            {
+                AddToFrame(_enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.Design);
+                AddToFrame(_enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.Design);
+            }
+            AddToFrame(27, 95, GetScoreDisplayList()); _efficientDrawFrameList.Reverse();
+            _loop.Draw(0, _efficientDrawFrameList.Count - 1, _efficientDrawFrameList);
+        }
 
-        //private bool CalculateCollision(ObjectSizeAndLocation objectSizeAndLocationA, ObjectSizeAndLocation objectSizeAndLocationB)
-        //{
-        //    var locationsObjectA = CreateLocationList(objectSizeAndLocationA.CollisionDimensions, objectSizeAndLocationA.Top, objectSizeAndLocationA.Left);
-        //    var locationsObjectB = CreateLocationList(objectSizeAndLocationB.CollisionDimensions, objectSizeAndLocationB.Top, objectSizeAndLocationB.Left);
+        private List<string> GetScoreDisplayList()
+        {
+            var scoreDisplayList = new List<string>
+            {
+                Convert.ToString(_car1.Score / ScoreDivider, CultureInfo.InvariantCulture),
+                "",
+                "",
+                Convert.ToString(_hostCar.Score / ScoreDivider, CultureInfo.InvariantCulture)
+            };
+            return scoreDisplayList;
+        }
 
-        //    foreach (var locationA in locationsObjectA)
-        //    {
-        //        foreach (var locationB in locationsObjectB)
-        //        {
-        //            if (locationA == locationB)
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-
-        //    return false;
-
-        //}
-
-        //private void Die(double score)
-        //{
-        //    Console.Clear();
-        //    var deathMessage = new List<string>()
-        //    {
-        //        "╚═════════════════════════════════════════════════╝",
-        //        "║   sincerly ~Jojo                                ║",
-        //        "║                                                 ║",
-        //        "║ in the meantime =)                              ║",
-        //        "║ You will be redirected to the Leader Board      ║",
-        //        "║                                                 ║",
-        //        "║ We will hold a minute of silence in your honor. ║",
-        //        "║ You are surely gonna be missed..                ║",
-        //        "║                                                 ║",
-        //        "║  You have died,                                 ║",
-        //        "║                                                 ║",
-        //        "╔═════════════════════════════════════════════════╗"
-        //    };
-        //    _loop.Draw(35, 20, deathMessage);
-        //    Thread.Sleep(1500);
-        //    var menu = new Menu();
-        //    menu.PressEnterToContinue("leader boards",23,40);
-        //    var leaderBoard = new LeaderBoard();
-        //    Console.Clear();
-        //    leaderBoard.CreateLeaderBoard(score, _settings);
-        //}
+        private void AddToFrame(int top, int left, List<string> whatIsAdded)
+        {
+            for (var i = 0; i < whatIsAdded.Count; i++)
+            {
+                if (top - i <= _groundList.Count - 1 && top - i >= 0)
+                {
+                    var cacheString = _efficientDrawFrameList[top - i];
+                    _efficientDrawFrameList[top - i] = _efficientDrawFrameList[top - i].Insert(left, whatIsAdded[i]);
+                    _efficientDrawFrameList[top - i] = _efficientDrawFrameList[top - i].Substring(0, left + whatIsAdded[i].Length);
+                    cacheString = cacheString.Substring(left + whatIsAdded[i].Length);
+                    _efficientDrawFrameList[top - i] += cacheString;
+                }
+            }
+        }
     }
 }

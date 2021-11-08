@@ -22,7 +22,7 @@ namespace Carcrash
         {
             var menu = new Menu();
             Console.ForegroundColor = menu._settings.Color;
-            menu._playBackgroundMusic.Start();
+            //menu._playBackgroundMusic.Start();
             menu.Start(menu._settings);
         }
 
@@ -139,6 +139,7 @@ namespace Carcrash
 
         public void PressEnterToContinue(string destination, int top,int left)
         {
+            Console.CursorVisible = false;
             Console.SetCursorPosition(left, top);
             Console.WriteLine("Press Enter to go to the " + destination + " OwO");
             while (Console.ReadKey(true).Key != ConsoleKey.Enter)

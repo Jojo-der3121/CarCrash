@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using Carcrash.Game;
 using Carcrash.Options;
@@ -14,6 +15,7 @@ namespace Carcrash
         private readonly Car _car1;
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Settings _settings;
+        private readonly List<string> _efficientDrawFrameList = new List<string>();
         private const int ScoreDivider = 25;
         private const int RightRoadLeftBoarder = 45;
         private const int RightRoadRightBoarder = 45 + 19;
@@ -60,24 +62,19 @@ namespace Carcrash
         {
             while (true)
             {
-                Draw(0, _groundList.Count - 1, _groundList);
-                Console.SetCursorPosition(95, 27);
-                Console.Write(_car1.Score / ScoreDivider);
-                Draw(RightRoadMiddleOfLeftLane, _road._top, _road.Design);
-                Draw(RightRoadMiddleOfRightLane, _road._top, _road.Design);
-                _road.Movement();
-                if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
-                {
-                    _enemyCar1.Movement(NoDeviation);
-                    Draw(_enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.Design);
-                }
-                _car1.Steer();
-                Draw(_car1.ObjectSizeAndLocation.Left, _car1.ObjectSizeAndLocation.Top, _car1.Design);
+                EfficientDraw();
                 GiveScore();
                 if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
                 {
                     break;
                 }
+                if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
+                {
+                    _enemyCar1.Movement(NoDeviation);
+                }
+                _road.Movement();
+                _car1.Steer();
+                Thread.Sleep(13);
             }
             if (_settings.Sound != 0)
             {
@@ -92,8 +89,7 @@ namespace Carcrash
             {
                 _car1.Score++;
             }
-            Thread.Sleep(10);
-            if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder-2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder-5)
+            if (_car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder - 2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder - 5)
             {
                 _car1.Score += ExtraScore;
             }
@@ -106,7 +102,7 @@ namespace Carcrash
             {
                 groundListModel.Add("                                            ║                 ║║                 ║                                       ");
             }
-            groundListModel[5] = groundListModel[7].Insert(95, "Score:").Remove(120);
+            groundListModel[26] = groundListModel[26].Insert(95, "Score:").Remove(120);
             return groundListModel;
         }
 
@@ -153,11 +149,51 @@ namespace Carcrash
                 if (y >= 0 && y <= 28)
                 {
                     Console.SetCursorPosition(x, y);
-                    Console.WriteLine(element);
+                    Console.Write(element);
                 }
                 y -= 1;
             }
 
+        }
+
+        private void EfficientDraw()
+        {
+            _efficientDrawFrameList.Clear();
+            _efficientDrawFrameList.AddRange(_groundList);
+            AddToFrame(_road.Top, RightRoadMiddleOfLeftLane, _road.Design);
+            AddToFrame(_road.Top, RightRoadMiddleOfRightLane, _road.Design);
+            AddToFrame(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _car1.Design);
+            if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
+            {
+                AddToFrame(_enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.Design);
+            }
+            AddToFrame(27, 95, GetScoreDisplayList());
+            _efficientDrawFrameList.Reverse();
+            Draw(0, _efficientDrawFrameList.Count - 1, _efficientDrawFrameList);
+        }
+
+        private List<string> GetScoreDisplayList()
+        {
+            var scoreDisplayList = new List<string>
+            {
+                Convert.ToString(_car1.Score / ScoreDivider, CultureInfo.InvariantCulture)
+            };
+            return scoreDisplayList;
+        }
+
+        private void AddToFrame(int top, int left, List<string> whatIsAdded)
+        {
+            for (var i = 0; i < whatIsAdded.Count; i++)
+            {
+                if (top - i <= _groundList.Count - 1 && top - i >= 0)
+                {
+                    var cacheString = _efficientDrawFrameList[top - i];
+                    _efficientDrawFrameList[top - i] = _efficientDrawFrameList[top - i].Insert(left, whatIsAdded[i]);
+                    _efficientDrawFrameList[top - i] = _efficientDrawFrameList[top - i].Substring(0, left + whatIsAdded[i].Length);
+                    cacheString = cacheString.Substring(left + whatIsAdded[i].Length);
+                    _efficientDrawFrameList[top - i] += cacheString;
+                }
+            }
         }
 
         public void Die(double score)

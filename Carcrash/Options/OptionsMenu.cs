@@ -58,9 +58,9 @@ namespace Carcrash
             Console.WriteLine("");
             Console.WriteLine("          Color");
             Console.WriteLine("");
-            Console.WriteLine("          Sound");
-            Console.WriteLine("");
             Console.WriteLine("          Songs");
+            Console.WriteLine("");
+            Console.WriteLine("          Sound");
             Console.WriteLine("");
             Console.WriteLine("          Back");
 
@@ -85,10 +85,10 @@ namespace Carcrash
                     EditColor(menu);
                     break;
                 case 17:
-                    EditSound(menu);
+                    EditSongSelection(menu);
                     break;
                 case 19:
-                    EditSongSelection(menu);
+                    EditSound(menu);
                     break;
                 case 21:
                     Console.Clear();
@@ -130,11 +130,11 @@ namespace Carcrash
 
         private void EditIpToConnectTo(Menu menu)
         {
-            Console.SetCursorPosition(40,10);
+            Console.SetCursorPosition(40, 10);
             Console.WriteLine("Please Enter the Ip-Address! :D");
-            Console.SetCursorPosition(39,11);
+            Console.SetCursorPosition(39, 11);
             Console.WriteLine("═══════════════════════════════════");
-            Console.SetCursorPosition(45,14);
+            Console.SetCursorPosition(45, 14);
             _settings.Ip = Console.ReadLine();
             Console.Clear();
             Configurate(_settings);
