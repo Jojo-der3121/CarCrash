@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Media;
 using Carcrash.Game;
 using Carcrash.Options;
 using Newtonsoft.Json;
@@ -181,21 +182,32 @@ namespace Carcrash
                 15 => 0,
                 _ => _settings.Sound
             };
+            if (_settings.Sound != 0)
+            {
+                menu.Player.SoundLocation = _settings.WhichSong;
+                menu.Player.PlayLooping();
+            }
+            else
+            {
+                menu.Player.Stop();
+            }
             Console.Clear();
             Configurate(_settings);
         }
 
         private void EditSongSelection(Menu menu)
         {
-            DrawTable("Song:        ", "  Alle meine Entchen   ", "Super Mario Bros. Theme", "        Tetris         ");
-            var selection = menu.SelectionProcess(11, 15, 39, 39 + 25);
+            DrawTable("Song:        ", "                        Tetris                         ", "                      Africa-toto                      ", "Just try it come on whats the worst that can happen? =)");
+            var selection = menu.SelectionProcess(11, 15, 39, 39 + 57);
             _settings.WhichSong = selection switch
             {
-                11 => 1,
-                13 => 2,
-                15 => 3,
+                11 => "Tetris.wav",
+                13 => "africa-toto.wav",
+                15 => "Rick_Astley_-_Never_Gonna_Give_You_Up_Qoret.com (online-audio-converter.com).wav",
                 _ => _settings.WhichSong
             };
+            menu.Player.SoundLocation = _settings.WhichSong;
+            menu.Player.Play();
             Console.Clear();
             Configurate(_settings);
         }

@@ -66,7 +66,7 @@ namespace Carcrash
                 GiveScore();
                 if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
                 {
-                    FillAnimationList(_car1.ObjectSizeAndLocation.Top,_car1.ObjectSizeAndLocation.Left);
+                    PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, FillAnimationList(),_settings.Sound);
                     break;
                 }
                 if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
@@ -76,10 +76,6 @@ namespace Carcrash
                 _road.Movement();
                 _car1.Steer();
                 Thread.Sleep(13);
-            }
-            if (_settings.Sound != 0)
-            {
-                Console.Beep(_settings.Sound, 1350);
             }
             Die(_car1.Score / ScoreDivider);
         }
@@ -218,13 +214,14 @@ namespace Carcrash
             Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
+            Console.Beep(1750,1000);
             menu.PressEnterToContinue("leader boards", 23, 40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
             leaderBoard.CreateLeaderBoard(score, _settings);
         }
 
-        private void FillAnimationList( int top, int left)
+        private List<List<string>> FillAnimationList()
         {
             var frame1 = new List<string>
             {
@@ -266,10 +263,10 @@ namespace Carcrash
                 "/≡ -   - ≡\\",
                 "<- .° ° ,->",
                 " -=═_ _═=-",
-                "  \\     /",
-                "   |   |",
+                "   \\   /",
+                "    | |",
                 ".-═=≡ ≡=═-.",
-                "  -\\   /-",
+                "   -\\ /-",
                 "   /| ;\\",
                 "-_-_-_-_-_-"
             };
@@ -298,9 +295,9 @@ namespace Carcrash
                 "/ /^    |°\\ \\",
                 " ((    c) ))",
                 "  - -|- - -",
-                "    \\  |/",
-                "    ||  | ",
-                "     | |",
+                " (( \\  |/ ))",
+                "     | /",
+                "     | | | ",
                 " .-═=≡ ≡=═-.",
                 "    -\\ /-",
                 "     | |",
@@ -327,13 +324,13 @@ namespace Carcrash
             frame8.Reverse();
             var frame9 = new List<string>
             {
-                " _~ _-",
-                "/^ ~ )\\",
-                " (  ;)",
-                " \\|",
-                "   \\",
-                "   /",
-                "  `",
+                "  _~ _-",
+                "  /^ ~ )\\",
+                "   (  ;)",
+                "   \\|",
+                "     \\",
+                "     /",
+                "   `",
                 "",
                 "   ´",
                 "  /",
@@ -366,61 +363,58 @@ namespace Carcrash
             {
                 "\\"
             };
-            //var animation = new List<List<string>>
-            //{
-            //    frame1,
-            //    frame2,
-            //    frame3,
-            //    frame4,
-            //    frame5,
-            //    frame6,
-            //    frame7,
-            //    frame8,
-            //    frame9,
-            //    frame10,
-            //    frame11,
-            //    frame12,
-            //    frame13
-            //};
-            Thread.Sleep(75);
-            Draw(left +3 - frame1[frame1.Count - 1].Length / 2, top-5, frame1);
-            Thread.Sleep(350);
-            Console.Clear();
-            Draw(left + 3 - frame2[frame2.Count - 1].Length / 2, top - 5, frame2);
-            Thread.Sleep(150);
-            Console.Clear();
-            Draw(left + 3 - frame3[frame3.Count - 1].Length / 2, top - 5, frame3);
-            Thread.Sleep(200);
-            Console.Clear();
-            Draw(left + 3 - frame4[frame4.Count - 1].Length / 2, top - 5, frame4);
-            Thread.Sleep(275);
-            Console.Clear();
-            Draw(left + 3 - frame5[frame5.Count - 1].Length / 2, top - 5, frame5);
-            Thread.Sleep(300);
-            Console.Clear();
-            Draw(left + 3 - frame6[frame6.Count - 1].Length / 2, top - 5, frame6);
-            Thread.Sleep(1000);
-            Console.Clear();
-            Draw(left + 3 - frame7[frame7.Count - 1].Length / 2, top - 5, frame7);
-            Thread.Sleep(500);
-            Console.Clear();
-            Draw(left + 3 - frame8[frame8.Count - 1].Length / 2, top - 5, frame8);
-            Thread.Sleep(100);
-            Console.Clear();
-            Draw(left + 3 - frame9[frame9.Count - 1].Length / 2, top -5, frame9);
-            Thread.Sleep(500);
-            Console.Clear();
-            Draw(left + 3 - frame10[frame10.Count - 1].Length / 2, top - 5, frame10);
-            Thread.Sleep(600);
-            Console.Clear();
-            Draw(left + 3 - frame11[frame11.Count - 1].Length / 2, top + 5, frame11);
-            Thread.Sleep(400);
-            Console.Clear();
-            Draw(left + 3 - frame12[frame12.Count - 1].Length / 2, top +5, frame12);
-            Thread.Sleep(100);
-            Console.Clear();
-            Draw(left + 3 - frame13[frame13.Count - 1].Length / 2, top + 5, frame13);
-            Thread.Sleep(200);
+            var animation = new List<List<string>>
+            {
+                frame1,
+                frame2,
+                frame3,
+                frame4,
+                frame5,
+                frame6,
+                frame7,
+                frame8,
+                frame9,
+                frame10,
+                frame11,
+                frame12,
+                frame13
+            };
+            return animation;
+
+        }
+
+        public void PlayExplosionAnimation(int top, int left, List<List<string>> frameList, int sound)
+        {
+            if (sound != 0)
+            {
+                var menu = new Menu();
+                menu.Player.SoundLocation = "mixkit-arcade-game-explosion-echo-1698-[AudioTrimmer (Joined by Happy Scribe) (1) (online-audio-converter.com).wav";
+                menu.Player.Play();
+            }
+            var timingList = new List<int>
+            {
+                1450,
+                150,
+                200,
+                275,
+                300,
+                1000,
+                500,
+                100,
+                500,
+                600,
+                400,
+                100,
+                200
+            };
+            Thread.Sleep(175);
+            for (var i = 0; i < frameList.Count; i++)
+            {
+                var frame = frameList[i];
+                Draw(left + 3 - frame[frame.Count - 1].Length / 2, top - 4, frame);
+                Thread.Sleep(timingList[i]);
+                Console.Clear();
+            }
         }
     }
 }

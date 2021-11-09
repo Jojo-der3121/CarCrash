@@ -12,13 +12,15 @@ namespace Carcrash.Game.OnlineGame
     class Host
     {
         private readonly List<string> _groundList;
+        private List<List<string>> animationFrameList = new List<List<string>>();
+        private bool _enemyDiedLast = false;
+        private int DeathLeft = 0;
         private readonly Road _road = new Road();
         private readonly Car _car1;
         private readonly Car _clientCar = new Car(74, 2, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
         private const int ScoreDivider = 25;
-        private const int ScoreBoardLeft = 95;
         private const int RightRoadLeftBoarder = 45;
         private const int RightRoadRightBoarder = 45 + 19;
         private const int LeftRoadLeftBoarder = 2;
@@ -45,6 +47,7 @@ namespace Carcrash.Game.OnlineGame
             _groundList = FillGroundList();
             _loop = new GameLoop(_settings);
             _car1 = new Car(31, 1, _settings.DifficultyLevel);
+            animationFrameList = FillAnimationList();
         }
 
         public void BootServer()
@@ -111,18 +114,50 @@ namespace Carcrash.Game.OnlineGame
         {
             try
             {
+                var clientCarDeathDesignIndex = 0;
+                var car1DeathDesignIndex = 0;
                 while (true)
                 {
                     EfficientDraw();
                     if (!_car1.Dead)
                     {
                         CheckIfDeadAndGiveScore();
+                        if (_car1.Dead && _clientCar.Dead)
+                        {
+                            _streamW.WriteLine("Play Explosion");
+                            _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, animationFrameList,_settings.Sound);
+                        }
+                        _car1.Steer();
+                    }
+                    else if (car1DeathDesignIndex < 74)
+                    {
+                        Thread.Sleep(10);
+                        if (car1DeathDesignIndex == 0)
+                        {
+                            DeathLeft = _car1.ObjectSizeAndLocation.Left;
+                        }
+                        _car1.Design = GiveRightAnimationFrame(car1DeathDesignIndex);
+                        _car1.ObjectSizeAndLocation.Left = DeathLeft - _car1.Design[_car1.Design.Count - 1].Length / 2;
+                        car1DeathDesignIndex++;
                     }
                     else
                     {
                         Thread.Sleep(10);
                     }
-                    _car1.Steer();
+                    if (_enemyDiedLast)
+                    {
+                        _loop.PlayExplosionAnimation(_clientCar.ObjectSizeAndLocation.Top, _clientCar.ObjectSizeAndLocation.Left, animationFrameList,_settings.Sound);
+                    }
+                    if (_clientCar.Dead && clientCarDeathDesignIndex < 74)
+                    {
+                        if (clientCarDeathDesignIndex == 0)
+                        {
+                            DeathLeft = _clientCar.ObjectSizeAndLocation.Left;
+                        }
+                        _clientCar.Design = GiveRightAnimationFrame(clientCarDeathDesignIndex);
+                        _clientCar.ObjectSizeAndLocation.Left = DeathLeft - _clientCar.Design[_clientCar.Design.Count - 1].Length / 2;
+                        clientCarDeathDesignIndex++;
+                    }
                     _streamW.WriteLine("hostCar Left:" + _car1.ObjectSizeAndLocation.Left);
                     _streamW.WriteLine("hostCar Top:" + _car1.ObjectSizeAndLocation.Top);
                     _road.Movement();
@@ -183,6 +218,9 @@ namespace Carcrash.Game.OnlineGame
                         case "clientCar Score":
                             _clientCar.Score = Convert.ToDouble(whichClientInformation[1]);
                             break;
+                        case "Play Explosion":
+                            _enemyDiedLast = true;
+                            break;
                     }
                 }
             }
@@ -234,7 +272,6 @@ namespace Carcrash.Game.OnlineGame
         private List<string> FillGroundList()
         {
             var groundListModel = new List<string>();
-
             for (var i = 0; i < 32; i++)
             {
                 groundListModel.Add(" ║                 ║║                 ║     ║                 ║║                 ║                                       ");
@@ -242,9 +279,6 @@ namespace Carcrash.Game.OnlineGame
             groundListModel[26] = groundListModel[26].Insert(95, "Car2Score:").Remove(120);
             groundListModel[23] = groundListModel[23].Insert(95, "Car1Score:").Remove(120);
             return groundListModel;
-
-
-
         }
 
         private void EfficientDraw()
@@ -294,6 +328,251 @@ namespace Carcrash.Game.OnlineGame
             }
         }
 
-    }
+        private List<List<string>> FillAnimationList()
+        {
+            var frame1 = new List<string>
+            {
+                "\\ | /",
+                "-(@)-",
+                "/-|-\\"
+            };
+            frame1.Reverse();
+            var frame2 = new List<string>
+            {
+                " /-\\",
+                "(|&|)",
+                "\\---/"
+            };
+            frame2.Reverse();
+            var frame3 = new List<string>
+            {
+                "|-^-|",
+                "\\(φ)/",
+                " |´|",
+                "/-=-\\"
+            };
+            frame3.Reverse();
+            var frame4 = new List<string>
+            {
+                " _^|^_",
+                "/(=^=)\\",
+                "<:═|-;>",
+                "  |;|",
+                ".-═=═-.",
+                " /| ,\\",
+                "- - - -"
+            };
+            frame4.Reverse();
+            var frame5 = new List<string>
+            {
+                "   -~^~-",
+                " ( ^   ^ )",
+                "/≡ -   - ≡\\",
+                "<- .° ° ,->",
+                " -=═_ _═=-",
+                "   \\   /",
+                "    | |",
+                ".-═=≡ ≡=═-.",
+                "   -\\ /-",
+                "   /| ;\\",
+                "-_-_-_-_-_-"
+            };
+            frame5.Reverse();
+            var frame6 = new List<string>
+            {
+                "    _~~~`~_-\\, _",
+                "   /  (     )- \\",
+                " ((             |",
+                " |  (  °   ))    )",
+                "\\.  ((        ), /",
+                "  ;\\\\~. - _ - / )`",
+                "      \\|| | /",
+                "       | ^ |",
+                " ,-═=≡&≡ φ ≡&≡=═-\\",
+                " ` - =≡| ≡ |═ -  ´",
+                "       /   \\",
+                "  - _-~ ~ ~_~_°",
+                " _°-_-_-_-_-_-;_-."
 
+            };
+            frame6.Reverse();
+            var frame7 = new List<string>
+            {
+                "   _~*;-^_",
+                "/ /^    |°\\ \\",
+                " ((    c) ))",
+                "  - -|- - -",
+                " (( \\  |/ ))",
+                "     | /",
+                "     | | | ",
+                " .-═=≡ ≡=═-.",
+                "    -\\ /-",
+                "     | |",
+                "    /| ;\\",
+                " -_-_-_-_-_-"
+            };
+            frame7.Reverse();
+            var frame8 = new List<string>
+            {
+                "  /^~*;-_°\\",
+                "( (       ) )",
+                "  - -|- -/-",
+                "    /  |\\",
+                "    (  ;) ",
+                "     |",
+                "      \\",
+                "     /φ",
+                "    | |",
+                "    |||\\",
+                " .- ═ ═ -.",
+                "   /´ ,\\",
+                "  - - - -"
+            };
+            frame8.Reverse();
+            var frame9 = new List<string>
+            {
+                "  _~ _-",
+                "  /^ ~ )\\",
+                "   (  ;)",
+                "   \\|",
+                "     \\",
+                "     /",
+                "   `",
+                "",
+                "   ´",
+                "  /",
+                "  φ\\",
+                "  | |",
+                " /-=-\\ "
+            };
+            frame9.Reverse();
+            var frame10 = new List<string>
+            {
+                "  `",
+                "  /",
+                "  ,|",
+                ".| ,\\"
+
+            };
+            frame10.Reverse();
+            var frame11 = new List<string>
+            {
+                "  .",
+                "  /",
+                "_|\\"
+            };
+            frame11.Reverse();
+            var frame12 = new List<string>
+            {
+                "_;"
+            };
+            var frame13 = new List<string>
+            {
+                "\\"
+            };
+            var frame14 = new List<string>
+            {
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  ",
+                "                  "
+            };
+            var animation = new List<List<string>>
+            {
+                frame1,
+                frame2,
+                frame3,
+                frame4,
+                frame5,
+                frame6,
+                frame7,
+                frame8,
+                frame9,
+                frame10,
+                frame11,
+                frame12,
+                frame13
+            };
+            return animation;
+
+        }
+
+        private List<string> GiveRightAnimationFrame(int durationOfDeath)
+        {
+
+            if (durationOfDeath >= 0 && durationOfDeath < 6)
+            {
+                return animationFrameList[0];
+            }
+
+            if (durationOfDeath >= 6 && durationOfDeath < 8)
+            {
+                return animationFrameList[1];
+            }
+
+            if (durationOfDeath >= 8 && durationOfDeath < 12)
+            {
+                return animationFrameList[2];
+            }
+
+            if (durationOfDeath >= 12 && durationOfDeath < 16)
+            {
+                return animationFrameList[3];
+            }
+
+            if (durationOfDeath >= 16 && durationOfDeath < 21)
+            {
+                return animationFrameList[4];
+            }
+
+            if (durationOfDeath >= 21 && durationOfDeath < 38)
+            {
+                return animationFrameList[5];
+            }
+
+            if (durationOfDeath >= 38 && durationOfDeath < 46)
+            {
+                return animationFrameList[6];
+            }
+
+            if (durationOfDeath >= 46 && durationOfDeath < 47)
+            {
+                return animationFrameList[7];
+            }
+
+            if (durationOfDeath >= 47 && durationOfDeath < 56)
+            {
+                return animationFrameList[8];
+            }
+
+            if (durationOfDeath >= 56 && durationOfDeath < 66)
+            {
+                return animationFrameList[9];
+            }
+
+            if (durationOfDeath >= 66 && durationOfDeath < 72)
+            {
+                return animationFrameList[10];
+            }
+
+            if (durationOfDeath >= 72 && durationOfDeath < 74)
+            {
+                return animationFrameList[11];
+            }
+            if (durationOfDeath >= 74)
+            {
+                return animationFrameList[12];
+            }
+            return null;
+        }
+
+    }
 }

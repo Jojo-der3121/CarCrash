@@ -10,7 +10,7 @@ namespace Carcrash
         public double Score = 0;
         public bool Dead = false;
         private readonly int _difficulty;
-        public readonly List<string> Design;
+        public List<string> Design;
 
         public Car(int left, int designIndex, int difficulty)
         {

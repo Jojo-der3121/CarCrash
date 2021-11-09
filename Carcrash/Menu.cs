@@ -1,17 +1,15 @@
 ﻿using System;
 using Carcrash.Game;
 using Carcrash.Options;
-using System.Threading;
+using System.Media;
 
 namespace Carcrash
 {
     class Menu
     {
         private readonly OptionsMenu _optionsMenu = new OptionsMenu();
-        public Settings _settings;
-
-        private static readonly BackGroundMusic BackGroundMusic = new BackGroundMusic();
-        private readonly Thread _playBackgroundMusic = new Thread(BackGroundMusic.PlaySong);
+        private Settings _settings;
+        public readonly SoundPlayer Player = new SoundPlayer();
 
         public Menu()
         {
@@ -22,7 +20,11 @@ namespace Carcrash
         {
             var menu = new Menu();
             Console.ForegroundColor = menu._settings.Color;
-            menu._playBackgroundMusic.Start();
+            menu.Player.SoundLocation = menu._settings.WhichSong;
+            if (menu._settings.Sound != 0)
+            {
+                menu.Player.PlayLooping();
+            }
             menu.Start(menu._settings);
         }
 
@@ -137,7 +139,7 @@ namespace Carcrash
             }
         }
 
-        public void PressEnterToContinue(string destination, int top,int left)
+        public void PressEnterToContinue(string destination, int top, int left)
         {
             Console.CursorVisible = false;
             Console.SetCursorPosition(left, top);

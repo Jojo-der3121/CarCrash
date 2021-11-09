@@ -44,7 +44,8 @@ namespace Carcrash
             _settings = settings;
             var loop = new GameLoop(_settings);
             var menu = new Menu();
-
+            menu.Player.SoundLocation = _settings.WhichSong;
+            menu.Player.PlayLooping();
             DrawHeadLine();
             FilePath = GetFilePath();
             CreateTable();
@@ -128,6 +129,10 @@ namespace Carcrash
                 if (name.Length > 36)
                 {
                     name = name.Truncate(33);
+                }
+                if (name == "")
+                {
+                    name = "*Anonymous User";
                 }
                 Console.WriteLine(name);
                 Console.SetCursorPosition(46 + 38, y);
