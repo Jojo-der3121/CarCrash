@@ -11,10 +11,10 @@ namespace Carcrash.Game.OnlineGame
     class Client
     {
         private readonly List<string> _groundList;
-        private readonly List<List<string>> _animationFrameList;
         private bool _enemyDiedLast = false;
         private int _deadLeft = 0;
         private readonly Road _road = new Road();
+        private Explosion _explosion;
         private Car _car1;
         private Car _hostCar = new Car(31, 1, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
@@ -42,16 +42,32 @@ namespace Carcrash.Game.OnlineGame
         public Client(Settings settings)
         {
             _settings = settings;
+            _explosion = new Explosion(_settings);
             _loop = new GameLoop(_settings);
             _host = new Host(_settings);
-            _groundList = FillGroundList();
-            _animationFrameList = _loop.FillAnimationList();
+            _groundList = _host.FillGroundList();
             _car1 = new Car(74, 2, _settings.DifficultyLevel);
         }
 
         public void ConnectToServer()
         {
-            _client = new TcpClient(_settings.Ip, 307);
+            DrawConnectingScreen();
+            try
+            {
+                _client = new TcpClient(_settings.Ip, 307);
+            }
+            catch (Exception)
+            {
+                Console.Clear();
+                Console.SetCursorPosition(45, 13);
+                Console.Write("UNABLE TO CONNECT TO SERVER .. =(");
+                Console.SetCursorPosition(39, 15);
+                Console.Write("(you will be send back to the main menu.. =/)");
+                Thread.Sleep(1500);
+                Console.Clear();
+                var menu = new Menu();
+                menu.Start(_settings);
+            }
             _stream = _client.GetStream();
             _streamW = new StreamWriter(_stream);
             _streamW.AutoFlush = true;
@@ -59,6 +75,19 @@ namespace Carcrash.Game.OnlineGame
             var thread = new Thread(GetServerAnswer);
             thread.Start();
             PlayAndTestGame();
+        }
+
+        private void DrawConnectingScreen()
+        {
+            var loadingScreenList = new List<string>
+            {
+                "┌─┐               │",
+                "│  ┌─┐├─┐├─┐┌─┐┌─ ┼.├─┐┌─┐",
+                "└─┘└─┘│ ││ │└──└─ │││ │└─┤ . . .",
+                "                       └─┘"
+            };
+            loadingScreenList.Reverse();
+            _loop.Draw(80, 25, loadingScreenList);
         }
 
         private void PlayAndTestGame()
@@ -92,7 +121,7 @@ namespace Carcrash.Game.OnlineGame
                     if (_car1.Dead && _hostCar.Dead)
                     {
                         _streamW.WriteLine("Play Explosion");
-                        _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                        _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings.Sound);
                         break;
                     }
                 }
@@ -101,9 +130,9 @@ namespace Carcrash.Game.OnlineGame
                     Thread.Sleep(10);
                     _car1 = ChangeToDeadCar(_car1);
                 }
-                if (_enemyDiedLast)
+                if (_enemyDiedLast || _hostCar.Dead && _car1.Dead)
                 {
-                    _loop.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                    _explosion.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _settings.Sound);
                     break;
                 }
                 if (_hostCar.Dead && _deathDesignIndex < 74)
@@ -130,7 +159,7 @@ namespace Carcrash.Game.OnlineGame
             {
                 _deadLeft = car.ObjectSizeAndLocation.Left;
             }
-            car.Design = GiveRightAnimationFrame(_deathDesignIndex);
+            car.Design = _explosion.GiveRightAnimationFrame(_deathDesignIndex);
             car.ObjectSizeAndLocation.Left = _deadLeft - car.Design[car.Design.Count - 1].Length / 2;
             _deathDesignIndex++;
             return car;
@@ -199,18 +228,6 @@ namespace Carcrash.Game.OnlineGame
             return false;
         }
 
-        private List<string> FillGroundList()
-        {
-            var groundListModel = new List<string>();
-            for (var i = 0; i < 32; i++)
-            {
-                groundListModel.Add(" ║                 ║║                 ║     ║                 ║║                 ║                                       ");
-            }
-            groundListModel[26] = groundListModel[26].Insert(95, "Car2Score:").Remove(120);
-            groundListModel[23] = groundListModel[23].Insert(95, "Car1Score:").Remove(120);
-            return groundListModel;
-        }
-
         private void CheckIfDeadAndGiveScore()
         {
             if (_car1.ObjectSizeAndLocation.Left < LeftRoadRightBoarder - 2 && _car1.ObjectSizeAndLocation.Left > LeftRoadLeftBoarder - 5 && !_car1.Dead || _car1.ObjectSizeAndLocation.Left < RightRoadRightBoarder - 2 && _car1.ObjectSizeAndLocation.Left > RightRoadLeftBoarder - 5 && !_car1.Dead)
@@ -273,74 +290,5 @@ namespace Carcrash.Game.OnlineGame
             }
         }
 
-        private List<string> GiveRightAnimationFrame(int durationOfDeath)
-        {
-
-
-            if (durationOfDeath >= 0 && durationOfDeath < 6)
-            {
-                return _animationFrameList[0];
-            }
-
-            if (durationOfDeath >= 6 && durationOfDeath < 8)
-            {
-                return _animationFrameList[1];
-            }
-
-            if (durationOfDeath >= 8 && durationOfDeath < 12)
-            {
-                return _animationFrameList[2];
-            }
-
-            if (durationOfDeath >= 12 && durationOfDeath < 16)
-            {
-                return _animationFrameList[3];
-            }
-
-            if (durationOfDeath >= 16 && durationOfDeath < 21)
-            {
-                return _animationFrameList[4];
-            }
-
-            if (durationOfDeath >= 21 && durationOfDeath < 38)
-            {
-                return _animationFrameList[5];
-            }
-
-            if (durationOfDeath >= 38 && durationOfDeath < 46)
-            {
-                return _animationFrameList[6];
-            }
-
-            if (durationOfDeath >= 46 && durationOfDeath < 47)
-            {
-                return _animationFrameList[7];
-            }
-
-            if (durationOfDeath >= 47 && durationOfDeath < 56)
-            {
-                return _animationFrameList[8];
-            }
-
-            if (durationOfDeath >= 56 && durationOfDeath < 66)
-            {
-                return _animationFrameList[9];
-            }
-
-            if (durationOfDeath >= 66 && durationOfDeath < 72)
-            {
-                return _animationFrameList[10];
-            }
-
-            if (durationOfDeath >= 72 && durationOfDeath < 74)
-            {
-                return _animationFrameList[11];
-            }
-            if (durationOfDeath >= 74)
-            {
-                return _animationFrameList[12];
-            }
-            return null;
-        }
     }
 }
