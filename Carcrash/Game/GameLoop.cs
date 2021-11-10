@@ -221,7 +221,7 @@ namespace Carcrash
             leaderBoard.CreateLeaderBoard(score, _settings);
         }
 
-        private List<List<string>> FillAnimationList()
+        public List<List<string>> FillAnimationList()
         {
             var frame1 = new List<string>
             {

@@ -44,8 +44,11 @@ namespace Carcrash
             _settings = settings;
             var loop = new GameLoop(_settings);
             var menu = new Menu();
-            menu.Player.SoundLocation = _settings.WhichSong;
-            menu.Player.PlayLooping();
+            if (settings.Sound != 0)
+            {
+                menu.Player.SoundLocation = settings.WhichSong;
+                menu.Player.PlayLooping();
+            }
             DrawHeadLine();
             FilePath = GetFilePath();
             CreateTable();
