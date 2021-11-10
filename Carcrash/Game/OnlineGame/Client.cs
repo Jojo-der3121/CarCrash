@@ -15,8 +15,8 @@ namespace Carcrash.Game.OnlineGame
         private bool _enemyDiedLast = false;
         private int _deadLeft = 0;
         private readonly Road _road = new Road();
-        private readonly Car _car1;
-        private readonly Car _hostCar = new Car(31, 1, 1);
+        private Car _car1;
+        private Car _hostCar = new Car(31, 1, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
         private const int ScoreDivider = 25;
@@ -36,11 +36,14 @@ namespace Carcrash.Game.OnlineGame
         private StreamWriter _streamW;
         private readonly GameLoop _loop;
         private readonly List<string> _efficientDrawFrameList = new List<string>();
+        private int _deathDesignIndex = 0;
+        private readonly Host _host;
 
         public Client(Settings settings)
         {
             _settings = settings;
             _loop = new GameLoop(_settings);
+            _host = new Host(_settings);
             _groundList = FillGroundList();
             _animationFrameList = _loop.FillAnimationList();
             _car1 = new Car(74, 2, _settings.DifficultyLevel);
@@ -55,67 +58,14 @@ namespace Carcrash.Game.OnlineGame
             _streamR = new StreamReader(_stream);
             var thread = new Thread(GetServerAnswer);
             thread.Start();
-            PlayGame();
+            PlayAndTestGame();
         }
 
-        private void PlayGame()
+        private void PlayAndTestGame()
         {
             try
             {
-                var hostCarDeathDesignIndex = 0;
-                var car1DeathDesignIndex = 0;
-                while (true)
-                {
-                    EfficientDraw();
-                    Thread.Sleep(10);
-                    if (!_car1.Dead)
-                    {
-                        CheckIfDeadAndGiveScore();
-                        if (_car1.Dead && _hostCar.Dead)
-                        {
-                            _streamW.WriteLine("Play Explosion");
-                            _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _animationFrameList,_settings.Sound);
-                            break;
-                        }
-                        _car1.Steer();
-                    }
-                    else if(car1DeathDesignIndex<74)
-                    {
-                        Thread.Sleep(10);
-                        if (car1DeathDesignIndex == 0)
-                        {
-                            _deadLeft = _car1.ObjectSizeAndLocation.Left;
-                        }
-                        _car1.Design = GiveRightAnimationFrame(car1DeathDesignIndex);
-                        _car1.ObjectSizeAndLocation.Left = _deadLeft - _car1.Design[_car1.Design.Count - 1].Length / 2;
-                        car1DeathDesignIndex++;
-                    }
-                    else
-                    {
-                        Thread.Sleep(10);
-                    }
-                    if (_enemyDiedLast)
-                    {
-                        _loop.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
-                        break;
-                    }
-                    if (_hostCar.Dead && hostCarDeathDesignIndex < 74)
-                    {
-                        if (hostCarDeathDesignIndex == 0)
-                        {
-                            _deadLeft = _hostCar.ObjectSizeAndLocation.Left;
-                        }
-                        _hostCar.Design = GiveRightAnimationFrame(hostCarDeathDesignIndex);
-                        _hostCar.ObjectSizeAndLocation.Left = _deadLeft - _hostCar.Design[_hostCar.Design.Count - 1].Length / 2;
-                        hostCarDeathDesignIndex++;
-                    }
-                    _streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
-                    _streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
-                    _streamW.WriteLine("clientCar deadStatus:" + _car1.Dead);
-                    _streamW.WriteLine("clientCar Score:" + _car1.Score);
-                    _road.Movement();
-                }
-                _loop.Die(_car1.Score / ScoreDivider);
+                ClientGameLoop();
             }
             catch (Exception)
             {
@@ -127,7 +77,63 @@ namespace Carcrash.Game.OnlineGame
                 var menu = new Menu();
                 menu.Start(_settings);
             }
+            _loop.Die(_car1.Score / ScoreDivider);
+        }
 
+        private void ClientGameLoop()
+        {
+            while (true)
+            {
+                EfficientDraw();
+                Thread.Sleep(10);
+                if (!_car1.Dead)
+                {
+                    CheckIfDeadAndGiveScore();
+                    if (_car1.Dead && _hostCar.Dead)
+                    {
+                        _streamW.WriteLine("Play Explosion");
+                        _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                        break;
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                    _car1 = ChangeToDeadCar(_car1);
+                }
+                if (_enemyDiedLast)
+                {
+                    _loop.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                    break;
+                }
+                if (_hostCar.Dead && _deathDesignIndex < 74)
+                {
+                    _hostCar = ChangeToDeadCar(_hostCar);
+                }
+                _road.Movement();
+                _car1.Steer();
+                GiveHostClientCarInfo();
+            }
+        }
+
+        private void GiveHostClientCarInfo()
+        {
+            _streamW.WriteLine("clientCar Left:" + _car1.ObjectSizeAndLocation.Left);
+            _streamW.WriteLine("clientCar Top:" + _car1.ObjectSizeAndLocation.Top);
+            _streamW.WriteLine("clientCar deadStatus:" + _car1.Dead);
+            _streamW.WriteLine("clientCar Score:" + _car1.Score);
+        }
+
+        private Car ChangeToDeadCar(Car car)
+        {
+            if (_deathDesignIndex == 0)
+            {
+                _deadLeft = car.ObjectSizeAndLocation.Left;
+            }
+            car.Design = GiveRightAnimationFrame(_deathDesignIndex);
+            car.ObjectSizeAndLocation.Left = _deadLeft - car.Design[car.Design.Count - 1].Length / 2;
+            _deathDesignIndex++;
+            return car;
         }
 
         private void GetServerAnswer()
@@ -137,7 +143,7 @@ namespace Carcrash.Game.OnlineGame
                 while (true)
                 {
                     var serverInformation = _streamR.ReadLine();
-                    var whichServerInformation = GetInformationValue(serverInformation);
+                    var whichServerInformation = _host.GetInformationValue(serverInformation);
                     switch (whichServerInformation[0])
                     {
                         case "hostCar Left":
@@ -174,12 +180,6 @@ namespace Carcrash.Game.OnlineGame
             {
                 // ignored
             }
-        }
-
-        private string[] GetInformationValue(string serverInformation)
-        {
-            var informationArray = serverInformation.Split(":");
-            return informationArray;
         }
 
         private bool CheckForCollisions(ObjectSizeAndLocation objectSizeAndLocationA)

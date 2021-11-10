@@ -16,8 +16,8 @@ namespace Carcrash.Game.OnlineGame
         private bool _enemyDiedLast = false;
         private int _deadLeft = 0;
         private readonly Road _road = new Road();
-        private readonly Car _car1;
-        private readonly Car _clientCar = new Car(74, 2, 1);
+        private Car _car1;
+        private Car _clientCar = new Car(74, 2, 1);
         private readonly Cars _enemyCar1 = new Cars(74);
         private readonly Cars _enemyCar2 = new Cars(74 - 43);
         private const int ScoreDivider = 25;
@@ -39,6 +39,7 @@ namespace Carcrash.Game.OnlineGame
         private StreamWriter _streamW;
         private readonly GameLoop _loop;
         private readonly List<string> _efficientDrawFrameList = new List<string>();
+        private int _deathDesignIndex= 0;
 
 
         public Host(Settings settings)
@@ -64,7 +65,7 @@ namespace Carcrash.Game.OnlineGame
             _streamR = new StreamReader(_stream);
             var thread = new Thread(GetClientAnswer);
             thread.Start();
-            PlayGame();
+            PlayAndTestGame();
         }
 
         private void AnimateLoadingScreen()
@@ -110,74 +111,11 @@ namespace Carcrash.Game.OnlineGame
             _loop.Draw(80, 25, loadingScreenList);
         }
 
-        private void PlayGame()
+        private void PlayAndTestGame()
         {
             try
             {
-                var clientCarDeathDesignIndex = 0;
-                var car1DeathDesignIndex = 0;
-                while (true)
-                {
-                    EfficientDraw();
-                    Thread.Sleep(10);
-                    if (!_car1.Dead)
-                    {
-                        CheckIfDeadAndGiveScore();
-                        if (_car1.Dead && _clientCar.Dead)
-                        {
-                            _streamW.WriteLine("Play Explosion");
-                            _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
-                            break;
-                        }
-                        _car1.Steer();
-                    }
-                    else if (car1DeathDesignIndex < 74)
-                    {
-                        Thread.Sleep(10);
-                        if (car1DeathDesignIndex == 0)
-                        {
-                            _deadLeft = _car1.ObjectSizeAndLocation.Left;
-                        }
-                        _car1.Design = GiveRightAnimationFrame(car1DeathDesignIndex);
-                        _car1.ObjectSizeAndLocation.Left = _deadLeft - _car1.Design[_car1.Design.Count - 1].Length / 2;
-                        car1DeathDesignIndex++;
-                    }
-                    else
-                    {
-                        Thread.Sleep(10);
-                    }
-                    if (_enemyDiedLast)
-                    {
-                        _loop.PlayExplosionAnimation(_clientCar.ObjectSizeAndLocation.Top, _clientCar.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
-                        break;
-                    }
-                    if (_clientCar.Dead && clientCarDeathDesignIndex < 74)
-                    {
-                        if (clientCarDeathDesignIndex == 0)
-                        {
-                            _deadLeft = _clientCar.ObjectSizeAndLocation.Left;
-                        }
-                        _clientCar.Design = GiveRightAnimationFrame(clientCarDeathDesignIndex);
-                        _clientCar.ObjectSizeAndLocation.Left = _deadLeft - _clientCar.Design[_clientCar.Design.Count - 1].Length / 2;
-                        clientCarDeathDesignIndex++;
-                    }
-                    _streamW.WriteLine("hostCar Left:" + _car1.ObjectSizeAndLocation.Left);
-                    _streamW.WriteLine("hostCar Top:" + _car1.ObjectSizeAndLocation.Top);
-                    _streamW.WriteLine("hostCar deadStatus:" + _car1.Dead);
-                    _streamW.WriteLine("hostCar Score:" + _car1.Score);
-                    _road.Movement();
-                    if (_car1.Score > ScoreDivider || _clientCar.Score > ScoreDivider)
-                    {
-                        _enemyCar1.Movement(NoDeviation);
-                        _enemyCar2.Movement(42);
-                        _streamW.WriteLine("enemyCar1Left:" + _enemyCar1.ObjectSizeAndLocation.Left);
-                        _streamW.WriteLine("enemyCar1Top:" + _enemyCar1.ObjectSizeAndLocation.Top);
-                        _streamW.WriteLine("enemyCar2Left:" + _enemyCar2.ObjectSizeAndLocation.Left);
-                        _streamW.WriteLine("enemyCar2Top:" + _enemyCar2.ObjectSizeAndLocation.Top);
-                    }
-
-                }
-                _loop.Die(_car1.Score / ScoreDivider);
+                HostGameLoop();
             }
             catch (Exception)
             {
@@ -189,6 +127,64 @@ namespace Carcrash.Game.OnlineGame
                 var menu = new Menu();
                 menu.Start(_settings);
             }
+            _loop.Die(_car1.Score / ScoreDivider);
+        }
+
+        private void HostGameLoop()
+        {
+            while (true)
+            {
+                EfficientDraw();
+                Thread.Sleep(10);
+                if (!_car1.Dead)
+                {
+                    CheckIfDeadAndGiveScore();
+                    if (_car1.Dead && _clientCar.Dead)
+                    {
+                        _streamW.WriteLine("Play Explosion");
+                        _loop.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                        break;
+                    }
+                    _car1.Steer();
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                    _car1 = ChangeToDeadCar(_car1);
+                }
+                if (_enemyDiedLast)
+                {
+                    _loop.PlayExplosionAnimation(_clientCar.ObjectSizeAndLocation.Top, _clientCar.ObjectSizeAndLocation.Left, _animationFrameList, _settings.Sound);
+                    break;
+                }
+                if (_clientCar.Dead && _deathDesignIndex < 74)
+                {
+                    _clientCar = ChangeToDeadCar(_clientCar);
+                }
+                _road.Movement();
+                _car1.Steer();
+                GiveClientHostCarInfos();
+                MoveEnemyCarsAndGiveLocationToClient();
+            }
+        }
+
+        private void GiveClientHostCarInfos()
+        {
+            _streamW.WriteLine("hostCar Left:" + _car1.ObjectSizeAndLocation.Left);
+            _streamW.WriteLine("hostCar Top:" + _car1.ObjectSizeAndLocation.Top);
+            _streamW.WriteLine("hostCar deadStatus:" + _car1.Dead);
+            _streamW.WriteLine("hostCar Score:" + _car1.Score);
+        }
+
+        private void MoveEnemyCarsAndGiveLocationToClient()
+        {
+            if (!(_car1.Score > ScoreDivider) && !(_clientCar.Score > ScoreDivider)) return;
+            _enemyCar1.Movement(NoDeviation);
+            _enemyCar2.Movement(42);
+            _streamW.WriteLine("enemyCar1Left:" + _enemyCar1.ObjectSizeAndLocation.Left);
+            _streamW.WriteLine("enemyCar1Top:" + _enemyCar1.ObjectSizeAndLocation.Top);
+            _streamW.WriteLine("enemyCar2Left:" + _enemyCar2.ObjectSizeAndLocation.Left);
+            _streamW.WriteLine("enemyCar2Top:" + _enemyCar2.ObjectSizeAndLocation.Top);
         }
 
         private void GetClientAnswer()
@@ -225,7 +221,19 @@ namespace Carcrash.Game.OnlineGame
             }
         }
 
-        private string[] GetInformationValue(string clientInformation)
+        private Car ChangeToDeadCar(Car car)
+        {
+            if (_deathDesignIndex == 0)
+            {
+                _deadLeft = car.ObjectSizeAndLocation.Left;
+            }
+            car.Design = GiveRightAnimationFrame(_deathDesignIndex);
+            car.ObjectSizeAndLocation.Left = _deadLeft - car.Design[car.Design.Count - 1].Length / 2;
+            _deathDesignIndex++;
+            return car;
+        }
+
+        public string[] GetInformationValue(string clientInformation)
         {
             var informationArray = clientInformation.Split(":");
             return informationArray;
