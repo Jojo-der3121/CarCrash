@@ -9,11 +9,9 @@ namespace Carcrash.Game
     class Explosion
     {
         private List<List<string>> _animationFrameList;
-        private Settings _settings;
 
-        public Explosion(Settings settings)
+        public Explosion()
         {
-            _settings = settings;
             _animationFrameList = FillAnimationList();
         }
 
@@ -178,9 +176,9 @@ namespace Carcrash.Game
             return animation;
         }
 
-        public void PlayExplosionAnimation(int top, int left, int sound)
+        public void PlayExplosionAnimation(int top, int left, Settings settings)
         {
-            if (sound != 0)
+            if (settings.Sound != 0)
             {
                 var menu = new Menu();
                 menu.Player.SoundLocation = "mixkit-arcade-game-explosion-echo-1698-[AudioTrimmer (Joined by Happy Scribe) (1) (online-audio-converter.com).wav";
@@ -206,7 +204,7 @@ namespace Carcrash.Game
             for (var i = 0; i < _animationFrameList.Count; i++)
             {
                 var frame = _animationFrameList[i];
-                var loop = new GameLoop(_settings);
+                var loop = new GameLoop(settings);
                 loop.Draw(left + 3 - frame[frame.Count - 1].Length / 2, top - 4, frame);
                 Thread.Sleep(timingList[i]);
                 Console.Clear();

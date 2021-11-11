@@ -38,11 +38,13 @@ namespace Carcrash.Game.OnlineGame
         private readonly List<string> _efficientDrawFrameList = new List<string>();
         private int _deathDesignIndex = 0;
         private readonly Host _host;
+        private bool _enemyCar1DesignWasChanged = false;
+        private bool _enemyCar2DesignWasChanged= false;
 
         public Client(Settings settings)
         {
             _settings = settings;
-            _explosion = new Explosion(_settings);
+            _explosion = new Explosion();
             _loop = new GameLoop(_settings);
             _host = new Host(_settings);
             _groundList = _host.FillGroundList();
@@ -121,7 +123,7 @@ namespace Carcrash.Game.OnlineGame
                     if (_car1.Dead && _hostCar.Dead)
                     {
                         _streamW.WriteLine("Play Explosion");
-                        _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings.Sound);
+                        _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings);
                         break;
                     }
                 }
@@ -132,7 +134,7 @@ namespace Carcrash.Game.OnlineGame
                 }
                 if (_enemyDiedLast || _hostCar.Dead && _car1.Dead)
                 {
-                    _explosion.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _settings.Sound);
+                    _explosion.PlayExplosionAnimation(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _settings);
                     break;
                 }
                 if (_hostCar.Dead && _deathDesignIndex < 74)
@@ -218,13 +220,12 @@ namespace Carcrash.Game.OnlineGame
                 _enemyCar1.ObjectSizeAndLocation,
                 _enemyCar2.ObjectSizeAndLocation
             };
-            foreach (var collisionBoarderB in allEnemyCollisionBoarders)
-            {
-                if (_loop.CalculateCollision(objectSizeAndLocationA, collisionBoarderB))
+            
+                if (_loop.CalculateCollision(objectSizeAndLocationA, allEnemyCollisionBoarders))
                 {
                     return true;
                 }
-            }
+            
             return false;
         }
 
@@ -256,11 +257,34 @@ namespace Carcrash.Game.OnlineGame
             AddToFrame(_hostCar.ObjectSizeAndLocation.Top, _hostCar.ObjectSizeAndLocation.Left, _hostCar.Design);
             if (_car1.Score > ScoreDivider || _hostCar.Score > ScoreDivider)
             {
+                ChangeEnemyCarDesign();
                 AddToFrame(_enemyCar1.ObjectSizeAndLocation.Top, _enemyCar1.ObjectSizeAndLocation.Left, _enemyCar1.Design);
                 AddToFrame(_enemyCar2.ObjectSizeAndLocation.Top, _enemyCar2.ObjectSizeAndLocation.Left, _enemyCar2.Design);
             }
             AddToFrame(27, 95, GetScoreDisplayList()); _efficientDrawFrameList.Reverse();
             _loop.Draw(0, _efficientDrawFrameList.Count - 1, _efficientDrawFrameList);
+        }
+
+        private void ChangeEnemyCarDesign()
+        {
+            if (_enemyCar1.ObjectSizeAndLocation.Left < 60)
+            {
+                _enemyCar1.ChangeDesign();
+                _enemyCar1DesignWasChanged = true;
+            }
+            else if (_enemyCar1DesignWasChanged)
+            {
+                _enemyCar1.Design = _enemyCar1.AutoModel();
+            }
+            if (_enemyCar2.ObjectSizeAndLocation.Left < 60 - 42)
+            {
+                _enemyCar2.ChangeDesign();
+                _enemyCar2DesignWasChanged = true;
+            }
+            else if (_enemyCar2DesignWasChanged)
+            {
+                _enemyCar2.Design = _enemyCar2.AutoModel();
+            }
         }
 
         private List<string> GetScoreDisplayList()

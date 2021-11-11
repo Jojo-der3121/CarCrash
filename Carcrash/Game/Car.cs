@@ -20,6 +20,7 @@ namespace Carcrash
             ObjectSizeAndLocation.Left = left;
             ObjectSizeAndLocation.Top = 26;
             ObjectSizeAndLocation.CollisionDimensions = objectDimensions;
+            ObjectSizeAndLocation.Height = 0;
         }
 
         private List<int> FillCollisionDimensions()
@@ -71,14 +72,14 @@ namespace Carcrash
                     {
                         case ConsoleKey.W:
                         case ConsoleKey.UpArrow:
-                            if (ObjectSizeAndLocation.Top > 0)
+                            if (ObjectSizeAndLocation.Top > 6)
                             {
                                 ObjectSizeAndLocation.Top--;
                             }
                             break;
                         case ConsoleKey.S:
                         case ConsoleKey.DownArrow:
-                            if (ObjectSizeAndLocation.Top < 29)
+                            if (ObjectSizeAndLocation.Top < 30)
                             {
                                 ObjectSizeAndLocation.Top++;
                             }

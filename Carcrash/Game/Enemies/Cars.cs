@@ -19,6 +19,7 @@ namespace Carcrash
             ObjectSizeAndLocation.Left = left;
             ObjectSizeAndLocation.Top = 0;
             ObjectSizeAndLocation.CollisionDimensions = objectDimensions;
+            ObjectSizeAndLocation.Height = 0;
         }
 
         private List<int> FillCollisionDimensions()
@@ -30,7 +31,7 @@ namespace Carcrash
             };
             return cacheList;
         }
-        private List<string> AutoModel()
+        public List<string> AutoModel()
         {
             var autoModel = new List<string>
             {
@@ -78,7 +79,7 @@ namespace Carcrash
             ObjectSizeAndLocation.Top = 0;
         }
 
-        private void ChangeDesign()
+        public void ChangeDesign()
         {
             Design.Clear();
             Design.Add("└═──═┘");

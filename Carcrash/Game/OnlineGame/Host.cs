@@ -45,11 +45,11 @@ namespace Carcrash.Game.OnlineGame
         public Host(Settings settings)
         {
             _settings = settings;
-            _explosion = new Explosion(_settings);
+            _explosion = new Explosion();
             _groundList = FillGroundList();
             _loop = new GameLoop(_settings);
             _car1 = new Car(31, 1, _settings.DifficultyLevel);
-          
+
         }
 
         public void BootServer()
@@ -143,7 +143,7 @@ namespace Carcrash.Game.OnlineGame
                     if (_car1.Dead && _clientCar.Dead)
                     {
                         _streamW.WriteLine("Play Explosion");
-                        _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings.Sound);
+                        _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings);
                         break;
                     }
                     _car1.Steer();
@@ -153,9 +153,9 @@ namespace Carcrash.Game.OnlineGame
                     Thread.Sleep(10);
                     _car1 = ChangeToDeadCar(_car1);
                 }
-                if (_enemyDiedLast||_clientCar.Dead && _car1.Dead)
+                if (_enemyDiedLast || _clientCar.Dead && _car1.Dead)
                 {
-                    _explosion.PlayExplosionAnimation(_clientCar.ObjectSizeAndLocation.Top, _clientCar.ObjectSizeAndLocation.Left, _settings.Sound);
+                    _explosion.PlayExplosionAnimation(_clientCar.ObjectSizeAndLocation.Top, _clientCar.ObjectSizeAndLocation.Left, _settings);
                     break;
                 }
                 if (_clientCar.Dead && _deathDesignIndex < 74)
@@ -247,13 +247,11 @@ namespace Carcrash.Game.OnlineGame
                 _enemyCar1.ObjectSizeAndLocation,
                 _enemyCar2.ObjectSizeAndLocation
             };
-            foreach (var collisionBoarderB in allEnemyCollisionBoarders)
+            if (_loop.CalculateCollision(objectSizeAndLocationA, allEnemyCollisionBoarders))
             {
-                if (_loop.CalculateCollision(objectSizeAndLocationA, collisionBoarderB))
-                {
-                    return true;
-                }
+                return true;
             }
+
             return false;
         }
 

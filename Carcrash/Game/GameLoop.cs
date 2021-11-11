@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using Carcrash.Game;
+using Carcrash.Game.Enemies;
 using Carcrash.Options;
 
 namespace Carcrash
@@ -11,6 +12,10 @@ namespace Carcrash
     {
 
         private readonly List<string> _groundList;
+        private List<ObjectSizeAndLocation> _enemyObjectSizeAndLocationList = new List<ObjectSizeAndLocation>();
+        private Meteor _meteor1 = new Meteor();
+        private Meteor _meteor2 = new Meteor();
+        private Meteor _meteor3 = new Meteor();
         private Explosion _explosion;
         private readonly Road _road = new Road();
         private readonly Car _car1;
@@ -26,10 +31,10 @@ namespace Carcrash
         private const int RightRoadMiddleOfRightLane = 72;
 
 
-        public GameLoop(Settings settings )
+        public GameLoop(Settings settings)
         {
             _settings = settings;
-            _explosion = new Explosion(_settings);
+            _explosion = new Explosion();
             Console.CursorVisible = false;
             _car1 = new Car(74, 0, _settings.DifficultyLevel);
             _groundList = FillGroundList();
@@ -65,21 +70,45 @@ namespace Carcrash
             while (true)
             {
                 EfficientDraw();
+                SpawnAndMoveMeteors();
                 GiveScore();
-                if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyCar1.ObjectSizeAndLocation))
+                _enemyObjectSizeAndLocationList.Add(_enemyCar1.ObjectSizeAndLocation);
+            
+                if (CalculateCollision(_car1.ObjectSizeAndLocation, _enemyObjectSizeAndLocationList))
                 {
-                    _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left,_settings.Sound);
+                    _explosion.PlayExplosionAnimation(_car1.ObjectSizeAndLocation.Top, _car1.ObjectSizeAndLocation.Left, _settings);
                     break;
                 }
+                _enemyObjectSizeAndLocationList.Clear();
                 if (_car1.Score > ScoreDivider * _settings.DifficultyLevel)
                 {
                     _enemyCar1.Movement(NoDeviation);
                 }
                 _road.Movement();
+              
                 _car1.Steer();
                 Thread.Sleep(13);
             }
             Die(_car1.Score / ScoreDivider);
+        }
+
+        private void SpawnAndMoveMeteors()
+        {
+            if (_car1.Score / 25 < 75) return;
+            Draw(_meteor1.DestinationCoordinates[1], _meteor1.DestinationCoordinates[0], _meteor1.DestinationDesign);
+            Draw(_meteor1.MeteorSizeAndLocation.Left, _meteor1.MeteorSizeAndLocation.Top, _meteor1.MeteorDesign);
+            _meteor1.Move();
+            _enemyObjectSizeAndLocationList.Add(_meteor1.MeteorSizeAndLocation);
+            if (_car1.Score / 25 < 150) return;
+            Draw(_meteor2.DestinationCoordinates[1], _meteor2.DestinationCoordinates[0], _meteor2.DestinationDesign);
+            Draw(_meteor2.MeteorSizeAndLocation.Left, _meteor2.MeteorSizeAndLocation.Top, _meteor2.MeteorDesign);
+            _meteor2.Move();
+            _enemyObjectSizeAndLocationList.Add(_meteor2.MeteorSizeAndLocation);
+            if (_car1.Score / 25 < 200) return;
+            Draw(_meteor3.DestinationCoordinates[1], _meteor3.DestinationCoordinates[0], _meteor3.DestinationDesign);
+            Draw(_meteor3.MeteorSizeAndLocation.Left, _meteor3.MeteorSizeAndLocation.Top, _meteor3.MeteorDesign);
+            _meteor3.Move();
+            _enemyObjectSizeAndLocationList.Add(_meteor3.MeteorSizeAndLocation);
         }
 
         private void GiveScore()
@@ -97,35 +126,36 @@ namespace Carcrash
         private List<string> FillGroundList()
         {
             var groundListModel = new List<string>();
-            for (var i = 0; i < 32; i++)
+            for (var i = 0; i < 33; i++)
             {
-                groundListModel.Add("                                            ║                 ║║                 ║                                       ");
+                groundListModel.Add("                                            ║                 ║║                 ║                                      ");
             }
             groundListModel[26] = groundListModel[26].Insert(95, "Score:").Remove(120);
             return groundListModel;
         }
 
-        public bool CalculateCollision(ObjectSizeAndLocation objectSizeAndLocationA, ObjectSizeAndLocation objectSizeAndLocationB)
+        public bool CalculateCollision(ObjectSizeAndLocation objectSizeAndLocationA, List<ObjectSizeAndLocation> enemyLocations)
         {
-            var locationsObjectA = CreateLocationList(objectSizeAndLocationA.CollisionDimensions, objectSizeAndLocationA.Top, objectSizeAndLocationA.Left);
-            var locationsObjectB = CreateLocationList(objectSizeAndLocationB.CollisionDimensions, objectSizeAndLocationB.Top, objectSizeAndLocationB.Left);
-
-            foreach (var locationA in locationsObjectA)
+            foreach (var objectSizeAndLocationB in enemyLocations)
             {
-                foreach (var locationB in locationsObjectB)
+                var locationsObjectA = CreateLocationList(objectSizeAndLocationA.CollisionDimensions, objectSizeAndLocationA.Top, objectSizeAndLocationA.Left, objectSizeAndLocationA.Height);
+                var locationsObjectB = CreateLocationList(objectSizeAndLocationB.CollisionDimensions, objectSizeAndLocationB.Top, objectSizeAndLocationB.Left, objectSizeAndLocationB.Height);
+
+                foreach (var locationA in locationsObjectA)
                 {
-                    if (locationA == locationB)
+                    foreach (var locationB in locationsObjectB)
                     {
-                        return true;
+                        if (locationA == locationB)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
-
             return false;
-
         }
 
-        private List<string> CreateLocationList(List<int> dimensionList, int y, int x)
+        private List<string> CreateLocationList(List<int> dimensionList, int y, int x, int z)
         {
             var locationList = new List<string>();
             var cacheList = new List<string>();
@@ -134,7 +164,7 @@ namespace Carcrash
                 cacheList.Add(Convert.ToString(y + i));
                 for (var e = 0; e < dimensionList[1]; e++)
                 {
-                    locationList.Add(cacheList[i] + ":" + Convert.ToString(x + e));
+                    locationList.Add(cacheList[i] + ":" + Convert.ToString(x + e) + ":" + z);
                 }
 
             }
@@ -145,7 +175,7 @@ namespace Carcrash
         {
             foreach (var element in whatToDraw)
             {
-                if (y >= 0 && y <= 28)
+                if (y > 0 && y <= 30 && x < Console.BufferWidth)
                 {
                     Console.SetCursorPosition(x, y);
                     Console.Write(element);
@@ -216,7 +246,7 @@ namespace Carcrash
             Draw(35, 20, deathMessage);
             Thread.Sleep(1500);
             var menu = new Menu();
-            Console.Beep(1750,1000);
+            Console.Beep(1750, 1000);
             menu.PressEnterToContinue("leader boards", 23, 40);
             var leaderBoard = new LeaderBoard();
             Console.Clear();
