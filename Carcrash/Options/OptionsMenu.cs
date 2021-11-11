@@ -207,7 +207,7 @@ namespace Carcrash
                 _ => _settings.WhichSong
             };
             menu.Player.SoundLocation = _settings.WhichSong;
-            menu.Player.Play();
+            menu.Player.PlayLooping();
             Console.Clear();
             Configurate(_settings);
         }
