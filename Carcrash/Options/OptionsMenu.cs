@@ -21,14 +21,8 @@ namespace Carcrash
 
         private string GetFilePath()
         {
-            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            var path = "";
-            for (var i = 0; i < directory.Length - 1; i++)
-            {
-                path += directory[i];
-                path += "Carcrash";
-            }
-            return path += "\\Options\\CarCrashSettings.json";
+            var directory = Directory.GetCurrentDirectory();
+            return directory += "\\CarCrashSettings.json";
         }
 
 

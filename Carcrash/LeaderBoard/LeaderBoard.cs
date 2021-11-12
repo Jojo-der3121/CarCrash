@@ -17,8 +17,7 @@ namespace Carcrash
         private string GetFilePath()
         {
             var whichDifficulty = "";
-            var directory = Directory.GetCurrentDirectory().Split("Carcrash");
-            var path = "";
+            var directory = Directory.GetCurrentDirectory();
             switch (_settings.DifficultyLevel)
             {
                 case 0:
@@ -31,12 +30,7 @@ namespace Carcrash
                     whichDifficulty = "Easy";
                     break;
             }
-            for (var i = 0; i < directory.Length - 1; i++)
-            {
-                path += directory[i];
-                path += "Carcrash";
-            }
-            return path += "\\LeaderBoard\\CarCrashLeaderBoard" + whichDifficulty + ".json";
+            return directory += "\\CarCrashLeaderBoard" + whichDifficulty + ".json";
         }
 
         public void CreateLeaderBoard(double score, Settings settings)

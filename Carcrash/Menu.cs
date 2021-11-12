@@ -148,7 +148,7 @@ namespace Carcrash
             {
                 if (Console.KeyAvailable)
                 {
-                    Console.ReadKey();
+                    Console.ReadKey(true);
                 }
             }
             Console.Clear();

@@ -175,7 +175,7 @@ namespace Carcrash
         {
             foreach (var element in whatToDraw)
             {
-                if (y > 0 && y <= 30 && x < Console.BufferWidth)
+                if (y > 0 && y <= 30 && x < Console.BufferWidth && x > -1)
                 {
                     Console.SetCursorPosition(x, y);
                     Console.Write(element);

@@ -14,6 +14,18 @@
     <None Update="africa-toto.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="CarCrashLeaderBoardEasy.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CarCrashLeaderBoardHard.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CarCrashLeaderBoardMedium.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CarCrashSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="mixkit-arcade-game-explosion-echo-1698-[AudioTrimmer %28Joined by Happy Scribe%29 %281%29 %28online-audio-converter.com%29.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
