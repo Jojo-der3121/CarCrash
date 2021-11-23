@@ -236,7 +236,7 @@ namespace Carcrash.Game.OnlineGame
 
         public string[] GetInformationValue(string clientInformation)
         {
-            var informationArray = clientInformation.Split(":");
+            var informationArray = clientInformation.Split(Convert.ToChar(":"));
             return informationArray;
         }
 

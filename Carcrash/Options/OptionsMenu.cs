@@ -139,13 +139,19 @@ namespace Carcrash
         {
             DrawTable("Difficulty:  ", "  Hard  ", " Medium ", "  Easy  ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
-            _settings.DifficultyLevel = selection switch
+            switch (selection)
             {
-                11 => 0,
-                13 => 1,
-                15 => 7,
-                _ => _settings.DifficultyLevel
-            };
+                case 11:
+                    _settings.DifficultyLevel = 0;
+                    break;
+                case 13:
+                    _settings.DifficultyLevel = 1;
+                    break;
+                case 15:
+                    _settings.DifficultyLevel = 7;
+                    break;
+
+            }
             Console.Clear();
             Configurate(_settings);
 
@@ -155,12 +161,15 @@ namespace Carcrash
         {
             DrawTable("Player Amount", "1P(local) ", "2P(online)", "          ");
             var selection = menu.SelectionProcess(11, 13, 39, 51);
-            _settings.PlayMode = selection switch
+            switch (selection)
             {
-                11 => PlayMode.SinglePlayer,
-                13 => PlayMode.MultiPlayer,
-                _ => _settings.PlayMode
-            };
+                case 11:
+                    _settings.PlayMode = PlayMode.SinglePlayer;
+                    break;
+                case 13:
+                    _settings.PlayMode = PlayMode.MultiPlayer;
+                    break;
+            }
             Console.Clear();
             Configurate(_settings);
         }
@@ -169,13 +178,18 @@ namespace Carcrash
         {
             DrawTable("Sound:       ", "  High  ", "  Deep  ", "  Mute  ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
-            _settings.Sound = selection switch
+            switch (selection)
             {
-                11 => 750,
-                13 => 350,
-                15 => 0,
-                _ => _settings.Sound
-            };
+                case 11:
+                    _settings.Sound = 750;
+                    break;
+                case 13:
+                    _settings.Sound = 350;
+                    break;
+                case 15:
+                    _settings.Sound = 0;
+                    break;
+            }
             if (_settings.Sound != 0)
             {
                 menu.Player.SoundLocation = _settings.WhichSong;
@@ -193,13 +207,18 @@ namespace Carcrash
         {
             DrawTable("Song:        ", "                        Tetris                         ", "                      Africa-toto                      ", "Just try it come on whats the worst that can happen? =)");
             var selection = menu.SelectionProcess(11, 15, 39, 39 + 57);
-            _settings.WhichSong = selection switch
+            switch (selection)
             {
-                11 => "Tetris.wav",
-                13 => "africa-toto.wav",
-                15 => "Rick_Astley_-_Never_Gonna_Give_You_Up_Qoret.com (online-audio-converter.com).wav",
-                _ => _settings.WhichSong
-            };
+                case 11:
+                    _settings.WhichSong = "Tetris.wav";
+                    break;
+                case 13:
+                    _settings.WhichSong = "africa-toto.wav";
+                    break;
+                case 15:
+                    _settings.WhichSong = "Rick_Astley_-_Never_Gonna_Give_You_Up_Qoret.com (online-audio-converter.com).wav";
+                    break;
+            }
             menu.Player.SoundLocation = _settings.WhichSong;
             menu.Player.PlayLooping();
             Console.Clear();
@@ -210,13 +229,18 @@ namespace Carcrash
         {
             DrawTable("Color :      ", " DarkRed", "DarkCyan", "  White ");
             var selection = menu.SelectionProcess(11, 15, 39, 49);
-            _settings.Color = selection switch
+            switch (selection)
             {
-                11 => ConsoleColor.DarkRed,
-                13 => ConsoleColor.DarkCyan,
-                15 => ConsoleColor.White,
-                _ => _settings.Color
-            };
+                case 11:
+                    _settings.Color = ConsoleColor.DarkRed;
+                    break;
+                case 13:
+                    _settings.Color = ConsoleColor.DarkCyan;
+                    break;
+                case 15:
+                    _settings.Color = ConsoleColor.White;
+                    break;
+            }
             Console.Clear();
             Console.ForegroundColor = _settings.Color;
             Configurate(_settings);
