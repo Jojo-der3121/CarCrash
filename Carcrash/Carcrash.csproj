@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -37,7 +37,7 @@
     <None Update="ReadMeForInfo.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Rick_Astley_-_Never_Gonna_Give_You_Up_Qoret.com %28online-audio-converter.com%29.wav">
+    <None Update="All-Stars(Smash-Mouth).wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Tetris.wav">

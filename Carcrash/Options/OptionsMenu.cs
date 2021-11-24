@@ -176,28 +176,20 @@ namespace Carcrash
 
         private void EditSound(Menu menu)
         {
-            DrawTable("Sound:       ", "  High  ", "  Deep  ", "  Mute  ");
-            var selection = menu.SelectionProcess(11, 15, 39, 49);
+            DrawTable("Sound:       ", "   On   ", "  Mute  ", "        ");
+            var selection = menu.SelectionProcess(11, 13, 39, 49);
             switch (selection)
             {
                 case 11:
                     _settings.Sound = 750;
+                    menu.Player.SoundLocation = _settings.WhichSong;
+                    menu.Player.PlayLooping();
                     break;
                 case 13:
-                    _settings.Sound = 350;
-                    break;
-                case 15:
                     _settings.Sound = 0;
+                    menu.Player.Stop();
                     break;
-            }
-            if (_settings.Sound != 0)
-            {
-                menu.Player.SoundLocation = _settings.WhichSong;
-                menu.Player.PlayLooping();
-            }
-            else
-            {
-                menu.Player.Stop();
+
             }
             Console.Clear();
             Configurate(_settings);
@@ -205,8 +197,8 @@ namespace Carcrash
 
         private void EditSongSelection(Menu menu)
         {
-            DrawTable("Song:        ", "                        Tetris                         ", "                      Africa-toto                      ", "Just try it come on whats the worst that can happen? =)");
-            var selection = menu.SelectionProcess(11, 15, 39, 39 + 57);
+            DrawTable("Song:        ", "   Tetris  ", "Africa-toto", " All Stars ");
+            var selection = menu.SelectionProcess(11, 15, 39, 39 + 13);
             switch (selection)
             {
                 case 11:
@@ -216,7 +208,7 @@ namespace Carcrash
                     _settings.WhichSong = "africa-toto.wav";
                     break;
                 case 15:
-                    _settings.WhichSong = "Rick_Astley_-_Never_Gonna_Give_You_Up_Qoret.com (online-audio-converter.com).wav";
+                    _settings.WhichSong = "All-Stars(Smash-Mouth).wav";
                     break;
             }
             menu.Player.SoundLocation = _settings.WhichSong;
